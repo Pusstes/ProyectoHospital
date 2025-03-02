@@ -1,0 +1,59 @@
+<!-- agregar css para que el footer no este completamente pegado al formulario de registro -->
+{% extends 'plantillaAdmin.html' %}
+{% block body %}
+<form action="/buscarMedico" method="POST" class="mt-4">
+    <div class="container mt-5">
+        <h2 class="text-center">Médicos Registrados</h2>
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>rfc</th>
+                    <th>nombre</th>
+                    <th>cedula</th>
+                    <th>correo</th>
+                    <th>especialidad</th>
+                    <th>rol</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for medico in medicos %}
+                <tr>
+                    <td>{{ medico.1 }}</td>
+                    <td>{{ medico.2 }}</td>
+                    <td>{{ medico.3 }}</td>
+                    <td>{{ medico.4 }}</td>
+                    <td>{{ medico.5 }}</td>
+                    <td>{{ medico.7 }}</td>
+
+                    <td>
+                        <a href="/editar/{{ medico[0] }}" class="btn btn-warning btn-sm">Editar</a>
+                        <a href="#" class="btn btn-danger btn-sm" onclick="confirmDelete('{{ medico[0] }}')">Eliminar</a>
+                    </td>
+                    {% endfor %}
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+</form>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function confirmDelete(medicoId) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "No podrás revertir esto",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '/eliminar/' + medicoId;
+            }
+        })
+    }
+</script>
+{% endblock %}

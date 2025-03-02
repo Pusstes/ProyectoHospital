@@ -1,0 +1,40 @@
+{% if session['rol'] == 'MedicoAdmin' %}
+    {% extends 'plantillaAdmin.html' %}
+{% else %}
+    {% extends 'plantilla.html' %}
+{% endif %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h2 class="text-center">Editar pacientes</h2>
+                <form action="/ActualizarPaciente/{{ paciente[0] }}" method="post" class="mt-4">
+                    <div class="form-group">
+                        <label for="nombreCompleto">Nombre Completo</label>
+                        <input type="text" class="form-control" id="nombreCompleto" value="{{ paciente[1] }}"  name="nombre">
+                    </div>
+                    <div class="form-group">
+                        <label for="fecha_nacimiento">Fecha de Nacimiento</label>
+                        <input type="date" class="form-control" id="fecha_nacimiento" value="{{ paciente[2] }}" name="fecha_nacimiento">
+                    </div>
+                    <div class="form-group">
+                        <label for="enfermedades_c">Enfermedades Cronicas</label>
+                        <input type="text" class="form-control" id="enfermedades_c" value="{{ paciente[3] }}" name="enfermedades_c">
+                    </div>
+                    <div class="form-group">
+                        <label for="alergias">Alergias</label>
+                        <input type="text" class="form-control" id="alergias" value="{{ paciente[4] }}" name="alergias">
+                    </div>
+                    <div class="form-group">
+                        <label for="antes_f">Antecedentes Familiares</label>
+                        <input type="text" class="form-control" id="antes_f" value="{{ paciente[5] }}" name="antes_f">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Actualizar Paciente</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+    

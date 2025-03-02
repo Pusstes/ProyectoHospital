@@ -1,0 +1,26 @@
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Número de Expediente</th>
+            <th>Nombre del Paciente</th>
+            <th>Fecha de Consulta</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for cita in citas %}
+        <tr>
+            <td>{{ cita[1] }}</td>
+            <td>{{ cita[2] }}</td>
+            <td>{{ cita[3] }}</td>
+            <td>
+                <a href="{{ url_for('imprimir_receta', cita_id=cita[0]) }}" class="btn btn-primary">Imprimir Receta</a>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="4">No hay citas disponibles.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

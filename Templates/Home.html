@@ -1,0 +1,64 @@
+{% if session['rol'] == 'MedicoAdmin' %}
+{% extends 'plantillaAdmin.html' %}
+{% else %}
+{% extends 'plantilla.html' %}
+{% endif %}
+
+{% block body %}
+<link rel="stylesheet" href="/static/CSS/Home.css">
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <h1>Bienvenidos al Hospital San Cristo</h1>
+            <p class="lead">Cuidando de ti y de tu familia con dedicación y profesionalismo.</p>
+            <hr class="my-4">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <!-- <h2>Mensaje de Bienvenida</h2> -->
+                    <p>En el Hospital San Cristo, estamos comprometidos con la salud y el bienestar. Eres parte del
+                        equipo de médicos y personal que está aquí para proporcionar la mejor atención posible. Gracias
+                        por ser parte del equipo.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="carousel slide custom-carousel" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target=".custom-carousel" data-bs-slide-to="0" class="active"
+            aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target=".custom-carousel" data-bs-slide-to="1"
+            aria-label="Slide 2"></button>
+        <button type="button" data-bs-target=".custom-carousel" data-bs-slide-to="2"
+            aria-label="Slide 3"></button>
+    </div>
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <div class="carousel-img-wrapper img-1">
+                <img src="{{ url_for('static', filename='IMG/hospital.jpg') }}" alt="Imagen de Bienvenida">
+            </div>
+        </div>
+        <div class="carousel-item">
+            <div class="carousel-img-wrapper img-2">
+                <img src="{{ url_for('static', filename='IMG/doctores2.jpg') }}" alt="Segunda Imagen">
+            </div>
+        </div>
+        <div class="carousel-item">
+            <div class="carousel-img-wrapper img-3">
+                <img src="{{ url_for('static', filename='IMG/sectorsalud.webp') }}" alt="Tercera Imagen">
+            </div>
+        </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target=".custom-carousel"
+        data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target=".custom-carousel"
+        data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+
+{% endblock %}

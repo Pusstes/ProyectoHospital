@@ -1,0 +1,141 @@
+{% if session['rol'] == 'MedicoAdmin' %}
+    {% extends 'plantillaAdmin.html' %}
+{% else %}
+    {% extends 'plantilla.html' %}
+{% endif %}
+
+{% block body %}
+<link rel="stylesheet" href="/static/CSS/expedientes.css">
+<div class="recipe-container">
+    <div class="header">
+        <img src="{{ url_for('static', filename='IMG/usuario.png') }}" alt="Folder">
+        <h3>Expediente de Paciente</h3>
+    </div>
+    <form id="expedienteForm" action="{{ url_for('registrar_expediente') }}" method="POST">
+        <div class="form-group row">
+            <label for="medico" class="col-sm-4 col-form-label">
+                <img src="{{ url_for('static', filename='IMG/doctores2.jpg') }}" alt="Medico"> Médico:
+            </label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="medico" name="medico" value="{{ session['nombre_medico'] }}" readonly>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="nombre_paciente" class="col-sm-4 col-form-label">
+                <img src="{{ url_for('static', filename='IMG/usuario.png') }}" alt="Nombre Paciente"> Paciente:
+            </label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="nombre_paciente" name="nombre_paciente" required>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="fecha_nacimiento" class="col-sm-4 col-form-label">
+                <img src="{{ url_for('static', filename='IMG/fecha.jpg') }}" alt="fecha"> Fecha de Nacimiento:
+            </label>
+            <div class="col-sm-8">
+                <input type="date" class="form-control" name="fecha_nacimiento" id="fecha_nacimiento" required>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="enfermedades_cronicas" class="col-sm-4 col-form-label">Enfermedades Crónicas:</label>
+            <div class="col-sm-8">
+                <textarea class="form-control" name="enfermedades_cronicas" id="enfermedades_cronicas" placeholder="Si no tiene escribre: NINGUNA" required></textarea>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="alergias" class="col-sm-4 col-form-label">Alergias:</label>
+            <div class="col-sm-8">
+                <textarea class="form-control" name="alergias" id="alergias" placeholder="Si no tiene escribre: NINGUNA" required></textarea>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="antecedentes_familiares" class="col-sm-4 col-form-label">Antecedentes Familiares:</label>
+            <div class="col-sm-8">
+                <textarea class="form-control" name="antecedentes_familiares" id="antecedentes_familiares" placeholder="Si no tiene escribre: NINGUNO" required></textarea>
+            </div>
+        </div>
+        <br>
+        <div class="form-group row">
+            <div class="col-sm-8 offset-sm-4">
+                <button type="button" class="btn btn-success" onclick="confirmSubmit()">Guardar</button>
+                <a id="cancelButton" href="/Home" class="btn btn-danger">Cancelar</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ejemplo de valores dinámicos
+        const valores = {
+            enfermedades_cronicas: 'NINGUNA',
+            alergias: 'NINGUNA',
+            antecedentes_familiares: 'NINGUNO'
+        };
+
+        document.getElementById('enfermedades_cronicas').value = valores.enfermedades_cronicas;
+        document.getElementById('alergias').value = valores.alergias;
+        document.getElementById('antecedentes_familiares').value = valores.antecedentes_familiares;
+    });
+</script>
+
+
+<script>
+    function confirmSubmit() {
+        const medico = document.getElementById('medico').value;
+        const paciente = document.getElementById('nombre_paciente').value;
+        const fechaNacimiento = document.getElementById('fecha_nacimiento').value;
+        const enfermedades = document.getElementById('enfermedades_cronicas').value;
+        const alergias = document.getElementById('alergias').value;
+        const antecedentes = document.getElementById('antecedentes_familiares').value;
+
+        if (!paciente || !fechaNacimiento || !enfermedades || !alergias || !antecedentes) {
+            Swal.fire({
+                title: 'Campos Vacíos',
+                text: 'Todos los campos son obligatorios. Por favor, completa todos los campos antes de guardar.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            });
+            return; // No continuar con la confirmación si hay campos vacíos
+        }
+
+        Swal.fire({
+            title: '¿Confirmar Registro?',
+            html: `<b>Médico:</b> ${medico}<br>
+                   <b>Paciente:</b> ${paciente}<br>
+                   <b>Fecha de Nacimiento:</b> ${fechaNacimiento}<br>
+                   <b>Enfermedades Crónicas:</b> ${enfermedades}<br>
+                   <b>Alergias:</b> ${alergias}<br>
+                   <b>Antecedentes Familiares:</b> ${antecedentes}`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Confirmar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('expedienteForm').submit();
+            }
+        });
+    }
+</script>
+
+<script>
+    document.getElementById('cancelButton').addEventListener('click', function(event) {
+        event.preventDefault(); // Evita la navegación inmediata
+
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: '¿Deseas regresar a la página de inicio? Los cambios no guardados se perderán.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, regresar',
+            cancelButtonText: 'No, cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = event.target.href; // Redirige al home si se confirma
+            }
+        });
+    });
+</script>
+
+{% endblock %}

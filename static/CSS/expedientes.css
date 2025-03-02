@@ -1,0 +1,25 @@
+
+.recipe-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+}
+.form-group img {
+    width: 32px;
+    height: 32px;
+}
+.form-group label img {
+    vertical-align: middle;
+    margin-right: 10px;
+}
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.header img {
+    width: 50px;
+    height: 50px;
+}

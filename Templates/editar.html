@@ -1,0 +1,91 @@
+<!-- en mexico no hay RFC iguales ni  cedulas iguales -->
+<!-- tenemos que mofificar que cuando se edite el medico solo se pueda modificar la contraseña, correo y rol -->
+<!-- pues no es necesario lo de la cedula y el rfc por que son unicos -->
+<!-- implementar que igual por usuario solo   pueda modificar su correo y contraseña -->
+<!-- la especialidad tal vez solo la puede modificar el medico admin por cuestiones de seguridad -->
+{% if session['rol'] == 'MedicoAdmin' %}
+    {% extends 'plantillaAdmin.html' %}
+{% else %}
+    {% extends 'plantilla.html' %}
+{% endif %}
+
+{% block body %}
+<div class="container mt-5">
+    <h2 class="text-center">Editar Médico</h2>
+    <form id="editarMedicoForm" action="/ActualizarMedico/{{ medico[0] }}" method="POST" class="mt-4">
+        <div class="form-group">
+            <label for="rfc">RFC:</label>
+            <input type="text" class="form-control" id="rfc" name="rfc" value="{{ medico[1] }}" required>
+        </div>
+        <div class="form-group">
+            <label for="nombre">Nombre:</label>
+            <input type="text" class="form-control" id="nombre" name="nombre" value="{{ medico[2] }}" required>
+        </div>
+        <div class="form-group">
+            <label for="cedula">Cédula:</label>
+            <input type="text" class="form-control" id="cedula" name="cedula" value="{{ medico[3] }}" required>
+        </div>
+        <div class="form-group">
+            <label for="correo">Correo:</label>
+            <input type="email" class="form-control" id="correo" name="correo" value="{{ medico[4] }}" required>
+        </div>
+        <div class="form-group">
+            <label for="especialidad">Especialidad:</label>
+            <input type="text" class="form-control" id="especialidad" name="especialidad" value="{{ medico[5] }}" required>
+        </div>
+        <div class="form-group">
+            <label for="pass">Contraseña:</label>
+            <input type="password" class="form-control" id="pass" name="pass" value="{{ medico[7] }}" required>
+        </div>
+        <div class="form-group">
+            <label for="rol">Rol:</label>
+            <select class="form-control" id="rol" required name="rol">
+                <option value="">Seleccione un rol</option>
+                <option value="MedicoAdmin">Médico Admin</option>
+                <option value="Medico">Médico</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Actualizar Médico</button>
+        <a  class="btn btn-success" href="/consulta">Regresar a los registros</a>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.getElementById('editarMedicoForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // Evita el envío inmediato del formulario
+
+    const rfc = document.getElementById('rfc').value;
+    const nombre = document.getElementById('nombre').value;
+    const cedula = document.getElementById('cedula').value;
+    const correo = document.getElementById('correo').value;
+    const especialidad = document.getElementById('especialidad').value;
+    const pass = document.getElementById('pass').value;
+    const rol = document.getElementById('rol').value;
+
+    // Muestra SweetAlert para confirmar los cambios
+    Swal.fire({
+        title: '¿Confirmar cambios?',
+        html: `
+            <strong>RFC:</strong> ${rfc}<br>
+            <strong>Nombre:</strong> ${nombre}<br>
+            <strong>Cédula:</strong> ${cedula}<br>
+            <strong>Correo:</strong> ${correo}<br>
+            <strong>Especialidad:</strong> ${especialidad}<br>
+            <strong>Rol:</strong> ${rol}
+        `,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, actualizar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Envía el formulario si el usuario confirma
+            e.target.submit();
+        }
+    });
+});
+</script>
+ 
+{% endblock %}
+    

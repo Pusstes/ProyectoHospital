@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/CSS/login.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+<body>
+    <div class="login-container">
+        <img src="{{ url_for('static', filename='IMG/doctor.png') }}" alt="Imagen de Bienvenida" class="img-fluid mt-4">
+        <form method="POST" action="/login-entrada">
+            <div class="form-group">
+                <label for="rfc">RFC:</label>
+                <input type="text" class="form-control" id="rfc" placeholder="Introduce tu RFC" name="rfc">
+            </div>
+            <div class="form-group">
+                <label for="password">Contraseña:</label>
+                <input type="password" class="form-control" id="password" placeholder="Introduce tu contraseña" name="password">
+            </div>
+            <button type="submit" class="btn btn-primary">Iniciar sesión</button> 
+        </form>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+              icon: '{{ "error" if category == "danger" else "success" if category == "success" else "warning" if category == "warning" else "info" }}',
+              title: '{{ message }}',
+              showConfirmButton: false,
+              timer: 3000
+            });
+          });
+        </script>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+</body>
+</html>

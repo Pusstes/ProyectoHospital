@@ -1,0 +1,59 @@
+{% if session['rol'] == 'MedicoAdmin' %}
+    {% extends 'plantillaAdmin.html' %}
+{% else %}
+    {% extends 'plantilla.html' %}
+{% endif %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1>Citas del Médico</h1>
+    
+    <!-- Formulario de Búsqueda -->
+    <form id="filtro-form" method="POST" class="mb-4">
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label for="buscar_nombre">Nombre del Paciente</label>
+                <input type="text" class="form-control" id="buscar_nombre" name="buscar_nombre" placeholder="Nombre del Paciente">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="buscar_expediente">Número de Expediente</label>
+                <input type="text" class="form-control" id="buscar_expediente" name="buscar_expediente" placeholder="Número de Expediente">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="buscar_fecha">Fecha de Consulta</label>
+                <input type="date" class="form-control" id="buscar_fecha" name="buscar_fecha">
+            </div>
+            <div class="form-group col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary" style="margin-right: 10px;">Buscar</button>
+                <a href="/citas_medico" class="btn btn-primary">Regresar a todas las citas</a>
+            </div>
+        </div>
+    </form>
+
+    <!-- Contenedor de la Tabla -->
+    <div id="citas-table-container">
+        {% include 'partials/citas_table.html' %}
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#filtro-form').on('submit', function(e) {
+            e.preventDefault(); // Evitar recarga de página
+            $.ajax({
+                type: 'POST',
+                url: window.location.href, // La URL actual
+                data: $(this).serialize(), // Serializar los datos del formulario
+                success: function(response) {
+                    $('#citas-table-container').html(response); // Actualizar la tabla
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}
+

@@ -1,0 +1,81 @@
+{% if session['rol'] == 'MedicoAdmin' %}
+    {% extends 'plantillaAdmin.html' %}
+{% else %}
+    {% extends 'plantilla.html' %}
+{% endif %}
+
+{% block body %}
+    <link rel="stylesheet" href="/static/CSS/expedientes.css">
+    <div class="recipe-container">
+        <div class="header">
+            <img src="{{ url_for('static', filename='IMG/usuario.png') }}"  alt="Folder">
+            <h3>Diagnóstico del Paciente</h3>
+        </div>
+        <form action="{{ url_for('registrar_diagnostico')  }}" method="POST">
+            <div class="form-group row">
+                <label for="id_paciente" class="col-sm-4 col-form-label">
+                    Paciente:
+                </label>
+                <div class="col-sm-8">
+                    <select name="id_paciente" id="id_paciente">
+                        {% if pacientes %}
+                            <option value="">Seleccione el paciente</option>
+                            {% for paciente in pacientes %}
+                                <option value="{{ paciente[0] }}">{{ paciente[1] }}</option>
+                            {% endfor %}
+                        {% else %}
+                            <option value="">No hay pacientes disponibles</option>
+                        {% endif %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="sintomas" class="col-sm-4 col-form-label">
+                    Síntomas:
+                </label>
+                <div class="col-sm-8">
+                    <textarea class="form-control" name="sintomas" id="sintomas" placeholder="Describa los síntomas del paciente" required></textarea>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="diagnostico" class="col-sm-4 col-form-label">
+                    Diagnóstico:
+                </label>
+                <div class="col-sm-8">
+                    <textarea class="form-control" name="diagnostico" id="diagnostico" placeholder="Diagnóstico del paciente" required></textarea>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="tratamiento" class="col-sm-4 col-form-label">
+                    Tratamiento:
+                </label>
+                <div class="col-sm-8">
+                    <textarea class="form-control" name="tratamiento" id="tratamiento" placeholder="Tratamiento recomendado" required></textarea>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="id_estudio" class="col-sm-4 col-form-label">
+                    Estudio:
+                </label>
+                <div class="col-sm-8">
+                    <select name="id_estudio" id="id_estudio">
+                        {% if estudios %}
+                            <option value="">Seleccione un estudio</option>
+                            {% for estudio in estudios %}
+                                <option value="{{ estudio[0] }}">{{ estudio[1] }}</option>
+                            {% endfor %}
+                        {% else %}
+                            <option value="">No hay estudios disponibles</option>
+                        {% endif %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-8 offset-sm-4">
+                    <button type="submit" class="btn btn-success">Guardar</button>
+                    <button type="reset" class="btn btn-danger">Cancelar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
