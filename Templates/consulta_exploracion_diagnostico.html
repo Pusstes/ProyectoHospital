@@ -5,59 +5,124 @@
 {% endif %}
 
 {% block body %}
-<div class="container mt-5">
-    <h2 class="text-center">Registrar Diagnóstico y Exploración</h2>
-    <form id="diagnosticoForm" action="{{ url_for('registrar_diagnostico') }}" method="POST">
-        <div class="form-group">
-            <label for="numeroDeExpediente">Número de Expediente</label>
-            <input type="text" class="form-control" id="numeroDeExpediente" name="numeroDeExpediente" value="{{ numeroDeExpediente }}" required>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="text-center mb-0">
+                        <i class="fas fa-stethoscope me-2"></i>Registrar Diagnóstico y Exploración
+                    </h2>
+                </div>
+                <div class="card-body p-4">
+                    <form id="diagnosticoForm" action="{{ url_for('registrar_diagnostico') }}" method="POST" class="needs-validation" novalidate>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="numeroDeExpediente" class="form-label">
+                                    <i class="fas fa-folder-open me-2"></i>Número de Expediente
+                                </label>
+                                <input type="text" class="form-control" id="numeroDeExpediente" name="numeroDeExpediente" value="{{ numeroDeExpediente }}" required>
+                                <div class="invalid-feedback">Este campo es obligatorio.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="FechaConsulta" class="form-label">
+                                    <i class="fas fa-calendar-day me-2"></i>Fecha de Consulta
+                                </label>
+                                <input type="date" class="form-control" id="FechaConsulta" name="FechaConsulta" value="{{ FechaConsulta }}" required>
+                                <div class="invalid-feedback">Este campo es obligatorio.</div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="Peso" class="form-label">
+                                    <i class="fas fa-weight me-2"></i>Peso (kg)
+                                </label>
+                                <input type="number" step="0.01" class="form-control" id="Peso" name="Peso" value="{{ Peso }}" required>
+                                <div class="invalid-feedback">Este campo es obligatorio.</div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="Altura" class="form-label">
+                                    <i class="fas fa-ruler-vertical me-2"></i>Altura (cm)
+                                </label>
+                                <input type="number" step="0.01" class="form-control" id="Altura" name="Altura" value="{{ Altura }}" required>
+                                <div class="invalid-feedback">Este campo es obligatorio.</div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="Temperatura" class="form-label">
+                                    <i class="fas fa-thermometer-half me-2"></i>Temperatura (°C)
+                                </label>
+                                <input type="number" step="0.1" class="form-control" id="Temperatura" name="Temperatura" value="{{ Temperatura }}" required>
+                                <div class="invalid-feedback">Este campo es obligatorio.</div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="Glucosa" class="form-label">
+                                    <i class="fas fa-tint me-2"></i>Glucosa (mg/dL)
+                                </label>
+                                <input type="number" step="0.01" class="form-control" id="Glucosa" name="Glucosa" value="{{ Glucosa }}" required>
+                                <div class="invalid-feedback">Este campo es obligatorio.</div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="LatidosxMinuto" class="form-label">
+                                    <i class="fas fa-heartbeat me-2"></i>Latidos por Minuto
+                                </label>
+                                <input type="number" class="form-control" id="LatidosxMinuto" name="LatidosxMinuto" value="{{ LatidosxMinuto }}" required>
+                                <div class="invalid-feedback">Este campo es obligatorio.</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Sintomas" class="form-label">
+                                <i class="fas fa-notes-medical me-2"></i>Síntomas
+                            </label>
+                            <textarea class="form-control" id="Sintomas" name="Sintomas" rows="3" required>{{ Sintomas }}</textarea>
+                            <div class="invalid-feedback">Este campo es obligatorio.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Diagnostico" class="form-label">
+                                <i class="fas fa-clipboard-check me-2"></i>Diagnóstico
+                            </label>
+                            <textarea class="form-control" placeholder="Enfermedad encontrada" id="Diagnostico" name="Diagnostico" rows="3" required>{{ Diagnostico }}</textarea>
+                            <div class="invalid-feedback">Este campo es obligatorio.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Tratamiento" class="form-label">
+                                <i class="fas fa-pills me-2"></i>Tratamiento
+                            </label>
+                            <textarea class="form-control" id="Tratamiento" placeholder="Medicamentos a recetar" name="Tratamiento" rows="3" required>{{ Tratamiento }}</textarea>
+                            <div class="invalid-feedback">Este campo es obligatorio.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Indicaciones" class="form-label">
+                                <i class="fas fa-file-prescription me-2"></i>Indicaciones
+                            </label>
+                            <textarea class="form-control" placeholder="Cómo se usará el medicamento" id="Indicaciones" name="Indicaciones" rows="3" required>{{ Indicaciones }}</textarea>
+                            <div class="invalid-feedback">Este campo es obligatorio.</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="Estudios" class="form-label">
+                                <i class="fas fa-microscope me-2"></i>Estudios (opcional)
+                            </label>
+                            <textarea class="form-control" id="Estudios" name="Estudios" rows="3">{{ Estudios }}</textarea>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="button" class="btn btn-primary" onclick="confirmSubmit()">
+                                <i class="fas fa-save me-2"></i>Guardar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="FechaConsulta">Fecha de Consulta</label>
-            <input type="date" class="form-control" id="FechaConsulta" name="FechaConsulta" value="{{ FechaConsulta }}" required>
-        </div>
-        <div class="form-group">
-            <label for="Peso">Peso (kg)</label>
-            <input type="number" step="0.01" class="form-control" id="Peso" name="Peso" value="{{ Peso }}" required>
-        </div>
-        <div class="form-group">
-            <label for="Altura">Altura (cm)</label>
-            <input type="number" step="0.01" class="form-control" id="Altura" name="Altura" value="{{ Altura }}" required>
-        </div>
-        <div class="form-group">
-            <label for="Temperatura">Temperatura (°C)</label>
-            <input type="number" step="0.1" class="form-control" id="Temperatura" name="Temperatura" value="{{ Temperatura }}" required>
-        </div>
-        <div class="form-group">
-            <label for="LatidosxMinuto">Latidos por Minuto</label>
-            <input type="number" class="form-control" id="LatidosxMinuto" name="LatidosxMinuto" value="{{ LatidosxMinuto }}" required>
-        </div>
-        <div class="form-group">
-            <label for="Glucosa">Glucosa (mg/dL)</label>
-            <input type="number" step="0.01" class="form-control" id="Glucosa" name="Glucosa" value="{{ Glucosa }}" required>
-        </div>
-        <div class="form-group">
-            <label for="Sintomas">Síntomas</label>
-            <textarea class="form-control" id="Sintomas" name="Sintomas" required>{{ Sintomas }}</textarea>
-        </div>
-        <div class="form-group">
-            <label for="Diagnostico">Diagnóstico</label>
-            <textarea class="form-control" placeholder="Enfermedad encontrada" id="Diagnostico" name="Diagnostico" required>{{ Diagnostico }}</textarea>
-        </div>
-        <div class="form-group">
-            <label for="Tratamiento">Tratamiento</label>
-            <textarea class="form-control" id="Tratamiento" placeholder="Medicamentos a recetar" name="Tratamiento" required>{{ Tratamiento }}</textarea>
-        </div>
-        <div class="form-group">
-            <label for="Indicaciones">Indicaciones</label>
-            <textarea class="form-control" placeholder="Como se usara el medicamento" id="Indicaciones" name="Indicaciones" required>{{ Indicaciones }}</textarea>
-        </div>
-        <div class="form-group">
-            <label for="Estudios">Estudios (opcional)</label>
-            <textarea class="form-control" id="Estudios" name="Estudios">{{ Estudios }}</textarea>
-        </div>
-        <button type="button" class="btn btn-primary" onclick="confirmSubmit()">Guardar</button>
-    </form>
+    </div>
 </div>
 
 <script>
@@ -74,30 +139,30 @@
         const Tratamiento = document.getElementById('Tratamiento').value.trim();
         const Indicaciones = document.getElementById('Indicaciones').value.trim();
     
-        // Aquí no incluimos el campo 'Estudios' ya que es opcional
         if (!numeroDeExpediente || !FechaConsulta || !Peso || !Altura || !Temperatura || 
             !LatidosxMinuto || !Glucosa || !Sintomas || !Diagnostico || !Tratamiento || !Indicaciones) {
             Swal.fire('Campos Vacíos', 'Por favor complete todos los campos obligatorios.', 'warning');
             return;
         }
     
-        // Aquí solo mostramos 'Estudios' si fue ingresado
         const Estudios = document.getElementById('Estudios').value.trim();
     
         Swal.fire({
             title: '¿Confirmar Registro?',
-            html: `<b>Número de Expediente:</b> ${numeroDeExpediente}<br>
-                   <b>Fecha de Consulta:</b> ${FechaConsulta}<br>
-                   <b>Peso:</b> ${Peso}<br>
-                   <b>Altura:</b> ${Altura}<br>
-                   <b>Temperatura:</b> ${Temperatura}<br>
-                   <b>Latidos por Minuto:</b> ${LatidosxMinuto}<br>
-                   <b>Glucosa:</b> ${Glucosa}<br>
-                   <b>Síntomas:</b> ${Sintomas}<br>
-                   <b>Diagnóstico:</b> ${Diagnostico}<br>
-                   <b>Tratamiento:</b> ${Tratamiento}<br>
-                   <b>Indicaciones:</b> ${Indicaciones}<br>` + 
-                   (Estudios ? `<b>Estudios:</b> ${Estudios}` : ''),
+            html: `<div class="text-start">
+                   <p><b><i class="fas fa-folder-open me-2"></i>Número de Expediente:</b> ${numeroDeExpediente}</p>
+                   <p><b><i class="fas fa-calendar-day me-2"></i>Fecha de Consulta:</b> ${FechaConsulta}</p>
+                   <p><b><i class="fas fa-weight me-2"></i>Peso:</b> ${Peso} kg</p>
+                   <p><b><i class="fas fa-ruler-vertical me-2"></i>Altura:</b> ${Altura} cm</p>
+                   <p><b><i class="fas fa-thermometer-half me-2"></i>Temperatura:</b> ${Temperatura} °C</p>
+                   <p><b><i class="fas fa-heartbeat me-2"></i>Latidos por Minuto:</b> ${LatidosxMinuto}</p>
+                   <p><b><i class="fas fa-tint me-2"></i>Glucosa:</b> ${Glucosa} mg/dL</p>
+                   <p><b><i class="fas fa-notes-medical me-2"></i>Síntomas:</b> ${Sintomas}</p>
+                   <p><b><i class="fas fa-clipboard-check me-2"></i>Diagnóstico:</b> ${Diagnostico}</p>
+                   <p><b><i class="fas fa-pills me-2"></i>Tratamiento:</b> ${Tratamiento}</p>
+                   <p><b><i class="fas fa-file-prescription me-2"></i>Indicaciones:</b> ${Indicaciones}</p>` + 
+                   (Estudios ? `<p><b><i class="fas fa-microscope me-2"></i>Estudios:</b> ${Estudios}</p>` : '') + 
+                   `</div>`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Confirmar',
@@ -108,7 +173,6 @@
             }
         });
     }
-    
 </script>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -139,6 +203,23 @@
             window.open(data.pdf_url, '_blank'); // Abre el PDF en una nueva pestaña
         }
     }
+    
+    // Validación de formulario
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
 </script>
-
 {% endblock %}
+

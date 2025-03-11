@@ -1,54 +1,78 @@
-<!-- agregar css para que el footer no este completamente pegado al formulario de registro -->
 {% extends 'plantillaAdmin.html' %}
 {% block body %}
-<form action="/buscarMedico" method="POST" class="mt-4">
-    <div class="container mt-5">
-        <h2 class="text-center">Médicos Registrados</h2>
-        <table class="table table-bordered table-striped">
-            <thead class="thead-dark">
-                <tr>
-                    <th>rfc</th>
-                    <th>nombre</th>
-                    <th>cedula</th>
-                    <th>correo</th>
-                    <th>especialidad</th>
-                    <th>rol</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for medico in medicos %}
-                <tr>
-                    <td>{{ medico.1 }}</td>
-                    <td>{{ medico.2 }}</td>
-                    <td>{{ medico.3 }}</td>
-                    <td>{{ medico.4 }}</td>
-                    <td>{{ medico.5 }}</td>
-                    <td>{{ medico.7 }}</td>
-
-                    <td>
-                        <a href="/editar/{{ medico[0] }}" class="btn btn-warning btn-sm">Editar</a>
-                        <a href="#" class="btn btn-danger btn-sm" onclick="confirmDelete('{{ medico[0] }}')">Eliminar</a>
-                    </td>
-                    {% endfor %}
-                </tr>
-
-            </tbody>
-        </table>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="text-center mb-0">
+                        <i class="fas fa-user-md me-2"></i>Médicos Registrados
+                    </h2>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th><i class="fas fa-id-card me-2"></i>RFC</th>
+                                    <th><i class="fas fa-user me-2"></i>Nombre</th>
+                                    <th><i class="fas fa-certificate me-2"></i>Cédula</th>
+                                    <th><i class="fas fa-envelope me-2"></i>Correo</th>
+                                    <th><i class="fas fa-stethoscope me-2"></i>Especialidad</th>
+                                    <th><i class="fas fa-user-tag me-2"></i>Rol</th>
+                                    <th><i class="fas fa-cogs me-2"></i>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for medico in medicos %}
+                                <tr>
+                                    <td>{{ medico.1 }}</td>
+                                    <td>{{ medico.2 }}</td>
+                                    <td>{{ medico.3 }}</td>
+                                    <td>{{ medico.4 }}</td>
+                                    <td>{{ medico.5 }}</td>
+                                    <td>
+                                        <span class="badge {% if medico.7 == 'MedicoAdmin' %}bg-primary{% else %}bg-success{% endif %} rounded-pill">
+                                            {{ medico.7 }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="/editar/{{ medico[0] }}" class="btn btn-warning btn-sm">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="#" class="btn btn-danger btn-sm" onclick="confirmDelete('{{ medico[0] }}')">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer text-end">
+                    <a href="/registro" class="btn btn-success">
+                        <i class="fas fa-user-plus me-2"></i>Registrar Nuevo Médico
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-</form>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</div>
+
 <script>
     function confirmDelete(medicoId) {
         Swal.fire({
             title: '¿Estás seguro?',
-            text: "No podrás revertir esto",
+            text: "Esta acción no se puede revertir",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
+            confirmButtonText: '<i class="fas fa-trash-alt me-2"></i>Sí, eliminar',
+            cancelButtonText: '<i class="fas fa-times me-2"></i>Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
                 window.location.href = '/eliminar/' + medicoId;

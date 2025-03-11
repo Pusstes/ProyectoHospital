@@ -1,61 +1,92 @@
 {% extends 'plantillaAdmin.html' %}
 {% block body %}
-
-<div class="container mt-5">
+<div class="container py-4">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <h2 class="text-center">Registro de Médicos</h2>
-            <form id="registroForm" action="/GuardarMedico" method="post">
-                <div class="form-group">
-                    <label for="rfc">RFC</label>
-                    <input type="text" class="form-control" id="rfc" placeholder="Ingrese su RFC" name="rfc" required value="{{ rfc or '' }}">
+        <div class="col-lg-8 col-md-10">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="text-center mb-0">
+                        <i class="fas fa-user-plus me-2"></i>Registro de Médicos
+                    </h2>
                 </div>
-                <div class="form-group">
-                    <label for="nombreCompleto">Nombre Completo</label>
-                    <input type="text" class="form-control" id="nombreCompleto" placeholder="Ingrese su nombre completo"
-                        name="nombre" required value="{{ nombre or '' }}">
+                <div class="card-body p-4">
+                    <form id="registroForm" action="/GuardarMedico" method="post" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="rfc" class="form-label">
+                                <i class="fas fa-id-card me-2"></i>RFC
+                            </label>
+                            <input type="text" class="form-control" id="rfc" placeholder="Ingrese su RFC" name="rfc" required value="{{ rfc or '' }}">
+                            <div class="invalid-feedback">Este campo es obligatorio.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="nombreCompleto" class="form-label">
+                                <i class="fas fa-user me-2"></i>Nombre Completo
+                            </label>
+                            <input type="text" class="form-control" id="nombreCompleto" placeholder="Ingrese su nombre completo" name="nombre" required value="{{ nombre or '' }}">
+                            <div class="invalid-feedback">Este campo es obligatorio.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="cedulaProfesional" class="form-label">
+                                <i class="fas fa-certificate me-2"></i>Cédula Profesional
+                            </label>
+                            <input type="number" class="form-control" id="cedulaProfesional" placeholder="Ingrese su cédula profesional" name="cedulaP" required value="{{ cedula or '' }}">
+                            <div class="invalid-feedback">Este campo es obligatorio.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="correo" class="form-label">
+                                <i class="fas fa-envelope me-2"></i>Correo Electrónico
+                            </label>
+                            <input type="email" class="form-control" id="correo" placeholder="Ingrese su correo electrónico" name="correo" required value="{{ correo or '' }}">
+                            <div class="invalid-feedback">Ingrese un correo electrónico válido.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="especialidad" class="form-label">
+                                <i class="fas fa-stethoscope me-2"></i>Especialidad
+                            </label>
+                            <input type="text" class="form-control" id="especialidad" placeholder="Ingrese su especialidad" name="especialidad" required value="{{ especialidad or '' }}">
+                            <div class="invalid-feedback">Este campo es obligatorio.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-lock me-2"></i>Contraseña
+                            </label>
+                            <input type="password" class="form-control" id="password" placeholder="Ingrese su contraseña" name="pass" required minlength="6">
+                            <div class="invalid-feedback">La contraseña debe tener al menos 6 caracteres.</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="rol" class="form-label">
+                                <i class="fas fa-user-tag me-2"></i>Rol
+                            </label>
+                            <select class="form-select" id="rol" required name="rol">
+                                <option value="">Seleccione un rol</option>
+                                <option value="MedicoAdmin" {% if rol == 'MedicoAdmin' %}selected{% endif %}>Médico Admin</option>
+                                <option value="Medico" {% if rol == 'Medico' %}selected{% endif %}>Médico</option>
+                            </select>
+                            <div class="invalid-feedback">Seleccione un rol.</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="fas fa-save me-2"></i>Registrar
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <div class="form-group">
-                    <label for="cedulaProfesional">Cédula Profesional</label>
-                    <input type="number" class="form-control" id="cedulaProfesional"
-                        placeholder="Ingrese su cédula profesional" name="cedulaP" required value="{{ cedula or '' }}">
-                </div>
-                <div class="form-group">
-                    <label for="correo">Correo Electrónico</label>
-                    <input type="email" class="form-control" id="correo" placeholder="Ingrese su correo electrónico"
-                        name="correo" required value="{{ correo or '' }}">
-                </div>
-                <div class="form-group">
-                    <label for="especialidad">Especialidad</label>
-                    <input type="text" class="form-control" id="especialidad" placeholder="Ingrese su especialidad"
-                        name="especialidad" required value="{{ especialidad or '' }}">
-                </div>
-                <div class="form-group">
-                    <label for="password">Contraseña</label>
-                    <input type="password" class="form-control" id="password" placeholder="Ingrese su contraseña"
-                        name="pass" required minlength="6">
-                </div>
-                <div class="form-group">
-                    <label for="rol">Rol</label>
-                    <select class="form-control" id="rol" required name="rol">
-                        <option value="">Seleccione un rol</option>
-                        <option value="MedicoAdmin" {% if rol == 'MedicoAdmin' %}selected{% endif %}>Médico Admin</option>
-                        <option value="Medico" {% if rol == 'Medico' %}selected{% endif %}>Médico</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block" id="submitBtn">Registrar</button>
-            </form>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- SweetAlert Script -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.getElementById('submitBtn').addEventListener('click', function(event) {
-        event.preventDefault(); // Previene el envío inmediato del formulario
+        event.preventDefault();
 
-        // Obtiene los valores de los campos del formulario
         var rfc = document.getElementById('rfc').value.trim();
         var nombre = document.getElementById('nombreCompleto').value.trim();
         var cedula = document.getElementById('cedulaProfesional').value.trim();
@@ -64,7 +95,6 @@
         var password = document.getElementById('password').value.trim();
         var rol = document.getElementById('rol').value.trim();
 
-        // Validar si algún campo está vacío
         if (!rfc || !nombre || !cedula || !correo || !especialidad || !password || !rol) {
             Swal.fire({
                 title: 'Error',
@@ -72,20 +102,21 @@
                 icon: 'error',
                 confirmButtonText: 'Ok'
             });
-            return; // Detiene la ejecución si hay campos vacíos
+            return;
         }
 
         var rolText = rol === 'MedicoAdmin' ? 'Médico Admin' : 'Médico';
 
-        // Muestra el cuadro de confirmación
         Swal.fire({
             title: '¿Estás seguro?',
-            html: `<p><strong>RFC:</strong> ${rfc}</p>
-                   <p><strong>Nombre Completo:</strong> ${nombre}</p>
-                   <p><strong>Cédula Profesional:</strong> ${cedula}</p>
-                   <p><strong>Correo Electrónico:</strong> ${correo}</p>
-                   <p><strong>Especialidad:</strong> ${especialidad}</p>
-                   <p><strong>Rol:</strong> ${rolText}</p>`,
+            html: `<div class="text-start">
+                   <p><b><i class="fas fa-id-card me-2"></i>RFC:</b> ${rfc}</p>
+                   <p><b><i class="fas fa-user me-2"></i>Nombre Completo:</b> ${nombre}</p>
+                   <p><b><i class="fas fa-certificate me-2"></i>Cédula Profesional:</b> ${cedula}</p>
+                   <p><b><i class="fas fa-envelope me-2"></i>Correo Electrónico:</b> ${correo}</p>
+                   <p><b><i class="fas fa-stethoscope me-2"></i>Especialidad:</b> ${especialidad}</p>
+                   <p><b><i class="fas fa-user-tag me-2"></i>Rol:</b> ${rolText}</p>
+                   </div>`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -94,10 +125,27 @@
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                document.getElementById('registroForm').submit(); // Envía el formulario si el usuario confirma
+                document.getElementById('registroForm').submit();
             }
         });
     });
+    
+    // Validación de formulario
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
 </script>
-
 {% endblock %}
+

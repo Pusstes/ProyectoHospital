@@ -5,73 +5,87 @@
 {% endif %}
 
 {% block body %}
-<link rel="stylesheet" href="/static/CSS/expedientes.css">
-<div class="recipe-container">
-    <div class="header">
-        <img src="{{ url_for('static', filename='IMG/usuario.png') }}" alt="Folder">
-        <h3>Actualizar Expediente de Paciente</h3>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="text-center mb-0">
+                        <i class="fas fa-folder-open me-2"></i>Actualizar Expediente de Paciente
+                    </h2>
+                </div>
+                <div class="card-body p-4">
+                    <form id="expedienteUpdateForm" action="{{ url_for('actualizarExpediente', id=expediente[0]) }}" method="POST" class="needs-validation" novalidate>
+                        <div class="mb-4">
+                            <label for="medico" class="form-label">
+                                <i class="fas fa-user-md me-2"></i>Médico
+                            </label>
+                            <input type="text" class="form-control" id="medico" name="medico" value="{{ session['nombre_medico'] }}" readonly>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="nombre_paciente" class="form-label">
+                                <i class="fas fa-user me-2"></i>Paciente
+                            </label>
+                            <input type="text" class="form-control" id="nombre_paciente" name="nombre_paciente" value="{{ expediente[2] }}" required>
+                            <div class="invalid-feedback">Este campo es obligatorio.</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="fecha_nacimiento" class="form-label">
+                                <i class="fas fa-calendar-alt me-2"></i>Fecha de Nacimiento
+                            </label>
+                            <input type="date" class="form-control" name="fecha_nacimiento" id="fecha_nacimiento" value="{{ expediente[3] }}" required>
+                            <div class="invalid-feedback">Este campo es obligatorio.</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="enfermedades_cronicas" class="form-label">
+                                <i class="fas fa-heartbeat me-2"></i>Enfermedades Crónicas
+                            </label>
+                            <textarea class="form-control" name="enfermedades_cronicas" id="enfermedades_cronicas" rows="3" required>{{ expediente[4] }}</textarea>
+                            <div class="invalid-feedback">Este campo es obligatorio.</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="alergias" class="form-label">
+                                <i class="fas fa-allergies me-2"></i>Alergias
+                            </label>
+                            <textarea class="form-control" name="alergias" id="alergias" rows="3" required>{{ expediente[5] }}</textarea>
+                            <div class="invalid-feedback">Este campo es obligatorio.</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="antecedentes_familiares" class="form-label">
+                                <i class="fas fa-users me-2"></i>Antecedentes Familiares
+                            </label>
+                            <textarea class="form-control" name="antecedentes_familiares" id="antecedentes_familiares" rows="3" required>{{ expediente[6] }}</textarea>
+                            <div class="invalid-feedback">Este campo es obligatorio.</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a id="cancelButton" href="{{ url_for('consultaP') }}" class="btn btn-outline-secondary me-md-2">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                            <button type="button" class="btn btn-primary" onclick="confirmUpdate()">
+                                <i class="fas fa-save me-2"></i>Actualizar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <form id="expedienteUpdateForm" action="{{ url_for('actualizarExpediente', id=expediente[0]) }}" method="POST" class="mt-4">
-        <div class="form-group row">
-            <label for="medico" class="col-sm-4 col-form-label">
-                <img src="{{ url_for('static', filename='IMG/doctores2.jpg') }}" alt="Medico"> Médico:
-            </label>
-            <div class="col-sm-8">
-                <input type="text" class="form-control" id="medico" name="medico" value="{{ session['nombre_medico'] }}" readonly>
-            </div>
-        </div>
-        <div class="form-group row">
-            <label for="nombre_paciente" class="col-sm-4 col-form-label">
-                <img src="{{ url_for('static', filename='IMG/usuario.png') }}" alt="Nombre Paciente"> Paciente:
-            </label>
-            <div class="col-sm-8">
-                <input type="text" class="form-control" id="nombre_paciente" name="nombre_paciente" value="{{ expediente[2] }}" required>
-            </div>
-        </div>
-        <div class="form-group row">
-            <label for="fecha_nacimiento" class="col-sm-4 col-form-label">
-                <img src="{{ url_for('static', filename='IMG/fecha.jpg') }}" alt="fecha"> Fecha de Nacimiento:
-            </label>
-            <div class="col-sm-8">
-                <input type="date" class="form-control" name="fecha_nacimiento" id="fecha_nacimiento" value="{{ expediente[3] }}" required>
-            </div>
-        </div>
-        <div class="form-group row">
-            <label for="enfermedades_cronicas" class="col-sm-4 col-form-label">Enfermedades Crónicas:</label>
-            <div class="col-sm-8">
-                <textarea class="form-control" name="enfermedades_cronicas" id="enfermedades_cronicas" required>{{ expediente[4] }}</textarea>
-            </div>
-        </div>
-        <div class="form-group row">
-            <label for="alergias" class="col-sm-4 col-form-label">Alergias:</label>
-            <div class="col-sm-8">
-                <textarea class="form-control" name="alergias" id="alergias" required>{{ expediente[5] }}</textarea>
-            </div>
-        </div>
-        <div class="form-group row">
-            <label for="antecedentes_familiares" class="col-sm-4 col-form-label">Antecedentes Familiares:</label>
-            <div class="col-sm-8">
-                <textarea class="form-control" name="antecedentes_familiares" id="antecedentes_familiares" required>{{ expediente[6] }}</textarea>
-            </div>
-        </div>
-        <br>
-        <div class="form-group row">
-            <div class="col-sm-8 offset-sm-4">
-                <button type="button" class="btn btn-success" onclick="confirmUpdate()">Actualizar</button>
-                <a id="cancelButton" href="{{ url_for('consultaP') }}" class="btn btn-danger">Cancelar</a>
-            </div>
-        </div>
-    </form>
 </div>
 
 <script>
     function confirmUpdate() {
         const medico = document.getElementById('medico').value;
-        const paciente = document.getElementById('nombre_paciente').value;
-        const fechaNacimiento = document.getElementById('fecha_nacimiento').value;
-        const enfermedades = document.getElementById('enfermedades_cronicas').value;
-        const alergias = document.getElementById('alergias').value;
-        const antecedentes = document.getElementById('antecedentes_familiares').value;
+        const paciente = document.getElementById('nombre_paciente').value.trim();
+        const fechaNacimiento = document.getElementById('fecha_nacimiento').value.trim();
+        const enfermedades = document.getElementById('enfermedades_cronicas').value.trim();
+        const alergias = document.getElementById('alergias').value.trim();
+        const antecedentes = document.getElementById('antecedentes_familiares').value.trim();
 
         if (!paciente || !fechaNacimiento || !enfermedades || !alergias || !antecedentes) {
             Swal.fire({
@@ -80,17 +94,19 @@
                 icon: 'error',
                 confirmButtonText: 'Aceptar'
             });
-            return; // No continuar con la confirmación si hay campos vacíos
+            return;
         }
 
         Swal.fire({
             title: '¿Confirmar Actualización?',
-            html: `<b>Médico:</b> ${medico}<br>
-                   <b>Paciente:</b> ${paciente}<br>
-                   <b>Fecha de Nacimiento:</b> ${fechaNacimiento}<br>
-                   <b>Enfermedades Crónicas:</b> ${enfermedades}<br>
-                   <b>Alergias:</b> ${alergias}<br>
-                   <b>Antecedentes Familiares:</b> ${antecedentes}`,
+            html: `<div class="text-start">
+                   <p><b><i class="fas fa-user-md me-2"></i>Médico:</b> ${medico}</p>
+                   <p><b><i class="fas fa-user me-2"></i>Paciente:</b> ${paciente}</p>
+                   <p><b><i class="fas fa-calendar-alt me-2"></i>Fecha de Nacimiento:</b> ${fechaNacimiento}</p>
+                   <p><b><i class="fas fa-heartbeat me-2"></i>Enfermedades Crónicas:</b> ${enfermedades}</p>
+                   <p><b><i class="fas fa-allergies me-2"></i>Alergias:</b> ${alergias}</p>
+                   <p><b><i class="fas fa-users me-2"></i>Antecedentes Familiares:</b> ${antecedentes}</p>
+                   </div>`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Confirmar',
@@ -103,7 +119,7 @@
     }
 
     document.getElementById('cancelButton').addEventListener('click', function(event) {
-        event.preventDefault(); // Evita la navegación inmediata
+        event.preventDefault();
 
         Swal.fire({
             title: '¿Estás seguro?',
@@ -114,10 +130,27 @@
             cancelButtonText: 'No, continuar editando'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = event.target.href; // Redirige a la consulta si se confirma
+                window.location.href = event.target.href;
             }
         });
     });
+    
+    // Validación de formulario
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
 </script>
-
 {% endblock %}
+

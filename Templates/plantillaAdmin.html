@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,146 +12,304 @@
     crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
-    /* Agrega margen inferior a la navbar */
-    nav.navbar {
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #3498db;
+      --accent-color: #2ecc71;
+      --danger-color: #e74c3c;
+      --warning-color: #f39c12;
+      --light-color: #ecf0f1;
+      --dark-color: #2c3e50;
+      --text-color: #333;
+      --text-light: #f8f9fa;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding-top: 70px;
+      background-color: #f5f7fa;
+      color: var(--text-color);
+    }
+    
+    .navbar {
+      background-color: var(--primary-color) !important;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .navbar-brand {
+      font-weight: 700;
+      color: var(--light-color) !important;
+    }
+    
+    .offcanvas-header {
+      background-color: var(--primary-color);
+      color: var(--light-color);
+    }
+    
+    .offcanvas-body {
+      background-color: var(--dark-color);
+    }
+    
+    .nav-link {
+      color: var(--light-color) !important;
+      transition: all 0.3s ease;
+      border-radius: 5px;
+      padding: 8px 15px !important;
+      margin: 5px 0;
+    }
+    
+    .nav-link:hover, .nav-link.active {
+      background-color: rgba(255, 255, 255, 0.1);
+      transform: translateX(5px);
+    }
+    
+    .dropdown-menu-dark {
+      background-color: #34495e;
+      border: none;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .dropdown-item {
+      color: var(--light-color);
+      padding: 10px 15px;
+      transition: all 0.2s ease;
+    }
+    
+    .dropdown-item:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      transform: translateX(5px);
+    }
+    
+    footer {
+      background-color: var(--primary-color);
+      color: var(--light-color);
+      margin-top: 50px;
+      padding: 40px 0 0 0;
+    }
+    
+    footer h5 {
+      color: var(--secondary-color);
+      font-weight: 600;
       margin-bottom: 20px;
     }
-  
-    /* Agrega margen superior al footer */
-    footer {
-      margin-top: 20px;
+    
+    footer .btn-floating {
+      background-color: var(--secondary-color);
+      color: var(--light-color);
+      transition: all 0.3s ease;
     }
-  
-    /* Asegura que el contenido del body tenga suficiente margen superior para evitar que se superponga con la navbar */
-    body {
-      padding-top: 70px; /* Ajusta este valor según la altura de tu navbar */
+    
+    footer .btn-floating:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .table {
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    .table thead {
+      background-color: var(--primary-color);
+      color: var(--light-color);
+    }
+    
+    .btn {
+      border-radius: 5px;
+      padding: 8px 16px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+      background-color: var(--secondary-color);
+      border-color: var(--secondary-color);
+    }
+    
+    .btn-success {
+      background-color: var(--accent-color);
+      border-color: var(--accent-color);
+    }
+    
+    .btn-danger {
+      background-color: var(--danger-color);
+      border-color: var(--danger-color);
+    }
+    
+    .btn-warning {
+      background-color: var(--warning-color);
+      border-color: var(--warning-color);
+      color: white;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card {
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      border: none;
+      transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .form-control {
+      border-radius: 5px;
+      padding: 10px 15px;
+      border: 1px solid #ddd;
+      transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.25);
+      border-color: var(--secondary-color);
+    }
+    
+    label {
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: #555;
+    }
+    
+    .container {
+      padding: 20px;
+    }
+    
+    h2, h3, h4 {
+      color: var(--primary-color);
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    
+    .text-center {
+      margin-bottom: 30px;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+      
+      .btn {
+        padding: 6px 12px;
+      }
+      
+      h2 {
+        font-size: 1.5rem;
+      }
     }
   </style>
-  
 </head>
 
 <body>
-      <!-- Example Code -->
-      <nav class="navbar navbar-dark bg-dark fixed-top">
-        <div class="container-fluid">
-          <a class="navbar-brand" href="/Home">Hospital San Cristo</a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
+  <nav class="navbar navbar-dark fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/Home">
+        <i class="fas fa-hospital-alt me-2"></i>Hospital San Cristo
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">
+            <i class="fas fa-user-md me-2"></i>Médico: {{ session['nombre_medico'] }}
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
             <li class="nav-item">
-              <span class="navbar-text">Médico: {{ session['nombre_medico'] }}</span>
-            </li>    
-            <div class="offcanvas-header">
-              <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">Acciones</h5>
-              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-            </div>
-            <div class="offcanvas-body">
-              <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                <li class="nav-item">
-                  <a class="nav-link active" aria-current="page" href="/Home">Página principal</a>
-                </li>
-                <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Gestion de Médicos
-                  </a>
-                  <ul class="dropdown-menu dropdown-menu-dark">
-                    <!-- link de la template de consulta -->
-                    <li><a class="dropdown-item" href="/consulta">Médicos registrados</a></li>
-                    <li><a class="dropdown-item" href="/registro">Registrar Médico</a></li>
-                  </ul>
-                </li>
-                <!-- gestion de pacientes -->
-              </li>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Gestión de Pacientes
-                </a>
-                <ul class="dropdown-menu dropdown-menu-dark">
-                  <li><a class="dropdown-item" href="/expedientes">Generar Expediente</a></li>
-                  <li><a class="dropdown-item" href="/consultaP">Consulta de Expedientes </a></li>
-                  <li><a class="dropdown-item" href="/consulta_exploracion_diagnostigo">Dar Consulta</a></li>
-                  <li><a class="dropdown-item" href="/citas_medico">Registro de las consultas</a></li>
-                </ul>
-              </li>
-              <li class="nav-item">
-              <button type="button" class="btn btn-outline-danger" onclick="confirmLogout()">Cerrar sesión</button>
+              <a class="nav-link active" aria-current="page" href="/Home">
+                <i class="fas fa-home me-2"></i>Página principal
+              </a>
             </li>
-              <!-- fin gestion pacientes -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-user-md me-2"></i>Gestión de Médicos
+              </a>
+              <ul class="dropdown-menu dropdown-menu-dark">
+                <li><a class="dropdown-item" href="/consulta"><i class="fas fa-list me-2"></i>Médicos registrados</a></li>
+                <li><a class="dropdown-item" href="/registro"><i class="fas fa-user-plus me-2"></i>Registrar Médico</a></li>
               </ul>
-            </div>
-          </div>
-        </div>
-      </nav>
-      
-        
-      <!-- End Example Code -->
-    </body>
-  </html>
-
-  {% block body %}
-  <!-- contendo de la template -->
-  {% endblock %}
-
-  <!-- footer chido -->
-
-
-  <footer class="text-white text-center text-lg-start bg-dark">
-    <!-- Grid container -->
-    <div class="container p-4">
-      <!--Grid row-->
-      <div class="row mt-4">
-        <!--Grid column-->
-        <div class="col-lg-4 col-md-12 mb-4 mb-md-0">
-          <h5 class="text-uppercase mb-4">Cococe un poco más de nuestra filosofía</h5>
-
-          <p>
-            Comprometidos con la excelencia médica y el bienestar integral del paciente, nuestro hospital promueve un
-            enfoque centrado en la compasión, la innovación y la colaboración interdisciplinaria. Nos esforzamos por
-            crear un entorno donde cada profesional de la salud pueda crecer, aprender y contribuir al cuidado de la
-            comunidad con los más altos estándares éticos y clínicos.
-          </p>
-
-          <p>
-            Aplicación desarrollada he implementada por:
-          </p>
-
-          <div class="mt-4">
-            <!-- Facebook -->
-            <a href="https://www.facebook.com/Geraram23"  target="_blank" type="button" class="btn btn-floating btn-light btn-lg"><i
-                class="fab fa-facebook-f"></i></a>
-            <!-- instagram -->
-            <a href="https://www.instagram.com/gera_al2/" target="_blank" type="button" class="btn btn-floating btn-light btn-lg"><i class="fab fa-instagram"></i></a>
-            <!-- Linkedin -->
-            <a  href="" target="_blank" type="button" class="btn btn-floating btn-light btn-lg"><i class="fab fa-linkedin"></i></a>
-          </div>
-        </div>
-        <!--Grid column-->
-
-        <!--Grid column-->
-        <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
-          <h5 class="text-uppercase mb-4 pb-1">Contacto</h5>
-
-          <ul class="fa-ul" style="margin-left: 1.65em;">
-            <li class="mb-3">
-              <span class="fa-li"><i class="fas fa-home"></i></span><span class="ms-2">Av. Constituyentes 302, El Jacal,
-                76187 Santiago de Querétaro, Qro.</span>
             </li>
-            <li class="mb-3">
-              <span class="fa-li"><i class="fas fa-envelope"></i></span><span
-                class="ms-2">contactGodCristo@outlook.com</span>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-users me-2"></i>Gestión de Pacientes
+              </a>
+              <ul class="dropdown-menu dropdown-menu-dark">
+                <li><a class="dropdown-item" href="/expedientes"><i class="fas fa-folder-plus me-2"></i>Generar Expediente</a></li>
+                <li><a class="dropdown-item" href="/consultaP"><i class="fas fa-folder-open me-2"></i>Consulta de Expedientes</a></li>
+                <li><a class="dropdown-item" href="/consulta_exploracion_diagnostigo"><i class="fas fa-stethoscope me-2"></i>Dar Consulta</a></li>
+                <li><a class="dropdown-item" href="/citas_medico"><i class="fas fa-calendar-check me-2"></i>Registro de las consultas</a></li>
+              </ul>
             </li>
-            <li class="mb-3">
-              <span class="fa-li"><i class="fas fa-phone"></i></span><span class="ms-2">+521 442 747 47 99</span>
+            <li class="nav-item mt-3">
+              <button type="button" class="btn btn-outline-danger w-100" onclick="confirmLogout()">
+                <i class="fas fa-sign-out-alt me-2"></i>Cerrar sesión
+              </button>
             </li>
           </ul>
         </div>
-        <!--Grid column-->
+      </div>
+    </div>
+  </nav>
 
-        <!--Grid column-->
+  {% block body %}
+  <!-- contenido de la template -->
+  {% endblock %}
+
+  <footer class="text-white text-lg-start">
+    <div class="container p-4">
+      <div class="row mt-4">
+        <div class="col-lg-4 col-md-12 mb-4 mb-md-0">
+          <h5 class="text-uppercase mb-4">Conoce un poco más de nuestra filosofía</h5>
+          <p>
+            Comprometidos con la excelencia médica y el bienestar integral del paciente, nuestro hospital promueve un
+            enfoque centrado en la compasión, la innovación y la colaboración interdisciplinaria.
+          </p>
+          <p>
+            Aplicación desarrollada e implementada por:
+          </p>
+          <div class="mt-4">
+            <a href="https://www.facebook.com/Geraram23" target="_blank" type="button" class="btn btn-floating btn-light btn-lg">
+              <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="https://www.instagram.com/gera_al2/" target="_blank" type="button" class="btn btn-floating btn-light btn-lg">
+              <i class="fab fa-instagram"></i>
+            </a>
+            <a href="" target="_blank" type="button" class="btn btn-floating btn-light btn-lg">
+              <i class="fab fa-linkedin"></i>
+            </a>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
+          <h5 class="text-uppercase mb-4 pb-1">Contacto</h5>
+          <ul class="fa-ul" style="margin-left: 1.65em;">
+            <li class="mb-3">
+              <span class="fa-li"><i class="fas fa-home"></i></span>
+              <span class="ms-2">Av. Constituyentes 302, El Jacal, 76187 Santiago de Querétaro, Qro.</span>
+            </li>
+            <li class="mb-3">
+              <span class="fa-li"><i class="fas fa-envelope"></i></span>
+              <span class="ms-2"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4b2824253f2a283f0c242f083922383f240b243e3f2724242065282426">[email&#160;protected]</a></span>
+            </li>
+            <li class="mb-3">
+              <span class="fa-li"><i class="fas fa-phone"></i></span>
+              <span class="ms-2">+521 442 747 47 99</span>
+            </li>
+          </ul>
+        </div>
         <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
           <h5 class="text-uppercase mb-4">Horario de consultas</h5>
-
           <table class="table text-center text-white">
             <tbody class="fw-normal">
               <tr>
@@ -170,29 +327,22 @@
             </tbody>
           </table>
         </div>
-        <!--Grid column-->
       </div>
-      <!--Grid row-->
     </div>
-    <!-- Grid container -->
-
-    <!-- Copyright -->
     <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
       © 2024 Copyright:
       <a class="text-white" href="https://github.com/Pusstes" target="_blank">Gerardo Alberto Ramirez Mejorada</a>
       <a> con contribución de: </a>
       <a class="text-white" href="https://github.com/josu460" target="_blank">Josue Rivera Cruz</a>
     </div>
-    <!-- Copyright -->
   </footer>
 
-
-  <!-- alert logout -->
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
   <script>
     function confirmLogout() {
       Swal.fire({
         title: '¿Estás seguro que quieres cerrar la sesión?',
-        text: "¡Regresaras a la página principal!",
+        text: "¡Regresarás a la página principal!",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
@@ -207,31 +357,26 @@
     }
   </script>
 
-
   {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     {% for category, message in messages %}
       <script>
         document.addEventListener('DOMContentLoaded', function () {
-          // Prepara el contenido del mensaje
           var icon = "{{ 'error' if category == 'danger' else 'success' if category == 'success' else 'warning' if category == 'warning' else 'info' }}";
           var messageContent = "{{ message|safe }}";
-
-          // Verificamos si el mensaje tiene un salto de línea usando una lógica más simple
           var isHtml = messageContent.includes("<br>") || messageContent.includes("<p>");
 
-          // Configuramos SweetAlert según el tipo de mensaje
           if (isHtml) {
             Swal.fire({
               icon: icon,
-              html: messageContent,  // Si contiene HTML, lo mostramos como HTML
+              html: messageContent,
               showConfirmButton: true,
               confirmButtonText: 'OK'
             });
           } else {
             Swal.fire({
               icon: icon,
-              text: messageContent,  // Si no contiene HTML, lo mostramos como texto
+              text: messageContent,
               showConfirmButton: false,
               timer: 3000
             });
@@ -241,8 +386,6 @@
     {% endfor %}
   {% endif %}
 {% endwith %}
-
-
 </body>
-
 </html>
+

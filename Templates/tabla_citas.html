@@ -5,34 +5,57 @@
 {% endif %}
 
 {% block body %}
-<div class="container mt-4">
-    <h1>Citas del Médico</h1>
-    
-    <!-- Formulario de Búsqueda -->
-    <form id="filtro-form" method="POST" class="mb-4">
-        <div class="form-row">
-            <div class="form-group col-md-3">
-                <label for="buscar_nombre">Nombre del Paciente</label>
-                <input type="text" class="form-control" id="buscar_nombre" name="buscar_nombre" placeholder="Nombre del Paciente">
-            </div>
-            <div class="form-group col-md-3">
-                <label for="buscar_expediente">Número de Expediente</label>
-                <input type="text" class="form-control" id="buscar_expediente" name="buscar_expediente" placeholder="Número de Expediente">
-            </div>
-            <div class="form-group col-md-3">
-                <label for="buscar_fecha">Fecha de Consulta</label>
-                <input type="date" class="form-control" id="buscar_fecha" name="buscar_fecha">
-            </div>
-            <div class="form-group col-md-3 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary" style="margin-right: 10px;">Buscar</button>
-                <a href="/citas_medico" class="btn btn-primary">Regresar a todas las citas</a>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="text-center mb-0">
+                        <i class="fas fa-calendar-check me-2"></i>Citas del Médico
+                    </h2>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Formulario de Búsqueda -->
+                    <form id="filtro-form" method="POST" class="mb-4">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="buscar_nombre" class="form-label">
+                                    <i class="fas fa-user me-2"></i>Nombre del Paciente
+                                </label>
+                                <input type="text" class="form-control" id="buscar_nombre" name="buscar_nombre" placeholder="Nombre del Paciente">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="buscar_expediente" class="form-label">
+                                    <i class="fas fa-folder-open me-2"></i>Número de Expediente
+                                </label>
+                                <input type="text" class="form-control" id="buscar_expediente" name="buscar_expediente" placeholder="Número de Expediente">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="buscar_fecha" class="form-label">
+                                    <i class="fas fa-calendar-alt me-2"></i>Fecha de Consulta
+                                </label>
+                                <input type="date" class="form-control" id="buscar_fecha" name="buscar_fecha">
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <div class="d-grid gap-2 w-100">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search me-2"></i>Buscar
+                                    </button>
+                                    <a href="/citas_medico" class="btn btn-outline-secondary">
+                                        <i class="fas fa-redo-alt me-2"></i>Restablecer
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Contenedor de la Tabla -->
+                    <div id="citas-table-container">
+                        {% include 'partials/citas_table.html' %}
+                    </div>
+                </div>
             </div>
         </div>
-    </form>
-
-    <!-- Contenedor de la Tabla -->
-    <div id="citas-table-container">
-        {% include 'partials/citas_table.html' %}
     </div>
 </div>
 
@@ -43,17 +66,35 @@
     $(document).ready(function() {
         $('#filtro-form').on('submit', function(e) {
             e.preventDefault(); // Evitar recarga de página
+            
+            // Mostrar indicador de carga
+            Swal.fire({
+                title: 'Buscando...',
+                text: 'Por favor espere mientras procesamos su búsqueda',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
             $.ajax({
                 type: 'POST',
                 url: window.location.href, // La URL actual
                 data: $(this).serialize(), // Serializar los datos del formulario
                 success: function(response) {
                     $('#citas-table-container').html(response); // Actualizar la tabla
+                    Swal.close(); // Cerrar el indicador de carga
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Ocurrió un error al procesar su búsqueda'
+                    });
                 }
             });
         });
     });
 </script>
-
 {% endblock %}
 
