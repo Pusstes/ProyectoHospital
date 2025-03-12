@@ -5,61 +5,137 @@
 {% endif %}
 
 {% block body %}
+
 <div class="container mt-5">
-    <h2 class="text-center">Registrar Diagnóstico y Exploración</h2>
-    <form id="diagnosticoForm" action="{{ url_for('registrar_diagnostico') }}" method="POST">
-        <div class="form-group">
-            <label for="numeroDeExpediente">Número de Expediente</label>
-            <input type="text" class="form-control" id="numeroDeExpediente" name="numeroDeExpediente" value="{{ numeroDeExpediente }}" required>
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h2 class="text-center mb-4">Registrar Diagnóstico y Exploración</h2>
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form id="diagnosticoForm" action="{{ url_for('registrar_diagnostico') }}" method="POST">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="numeroDeExpediente" class="form-label fw-bold">Número de Expediente</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="fas fa-folder"></i></span>
+                                        <input type="text" class="form-control" id="numeroDeExpediente" name="numeroDeExpediente" value="{{ numeroDeExpediente }}" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="FechaConsulta" class="form-label fw-bold">Fecha de Consulta</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="fas fa-calendar"></i></span>
+                                        <input type="date" class="form-control" id="FechaConsulta" name="FechaConsulta" value="{{ FechaConsulta }}" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="Peso" class="form-label fw-bold">Peso (kg)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="fas fa-weight"></i></span>
+                                        <input type="number" step="0.01" class="form-control" id="Peso" name="Peso" value="{{ Peso }}" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="Altura" class="form-label fw-bold">Altura (cm)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="fas fa-ruler-vertical"></i></span>
+                                        <input type="number" step="0.01" class="form-control" id="Altura" name="Altura" value="{{ Altura }}" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label for="Temperatura" class="form-label fw-bold">Temperatura (°C)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="fas fa-thermometer-half"></i></span>
+                                        <input type="number" step="0.1" class="form-control" id="Temperatura" name="Temperatura" value="{{ Temperatura }}" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label for="LatidosxMinuto" class="form-label fw-bold">Latidos por Minuto</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="fas fa-heartbeat"></i></span>
+                                        <input type="number" class="form-control" id="LatidosxMinuto" name="LatidosxMinuto" value="{{ LatidosxMinuto }}" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label for="Glucosa" class="form-label fw-bold">Glucosa (mg/dL)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="fas fa-tint"></i></span>
+                                        <input type="number" step="0.01" class="form-control" id="Glucosa" name="Glucosa" value="{{ Glucosa }}" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="Sintomas" class="form-label fw-bold">Síntomas</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fas fa-notes-medical"></i></span>
+                                <textarea class="form-control" id="Sintomas" name="Sintomas" rows="3" required>{{ Sintomas }}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="Diagnostico" class="form-label fw-bold">Diagnóstico</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fas fa-stethoscope"></i></span>
+                                <textarea class="form-control" placeholder="Enfermedad encontrada" id="Diagnostico" name="Diagnostico" rows="3" required>{{ Diagnostico }}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="Tratamiento" class="form-label fw-bold">Tratamiento</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fas fa-prescription-bottle-alt"></i></span>
+                                <textarea class="form-control" id="Tratamiento" placeholder="Medicamentos a recetar" name="Tratamiento" rows="3" required>{{ Tratamiento }}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="Indicaciones" class="form-label fw-bold">Indicaciones</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fas fa-clipboard-list"></i></span>
+                                <textarea class="form-control" placeholder="Como se usara el medicamento" id="Indicaciones" name="Indicaciones" rows="3" required>{{ Indicaciones }}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label for="Estudios" class="form-label fw-bold">Estudios (opcional)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fas fa-flask"></i></span>
+                                <textarea class="form-control" id="Estudios" name="Estudios" rows="3">{{ Estudios }}</textarea>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn btn-primary w-100" onclick="confirmSubmit()">
+                            <i class="fas fa-save me-2"></i>Guardar
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="FechaConsulta">Fecha de Consulta</label>
-            <input type="date" class="form-control" id="FechaConsulta" name="FechaConsulta" value="{{ FechaConsulta }}" required>
-        </div>
-        <div class="form-group">
-            <label for="Peso">Peso (kg)</label>
-            <input type="number" step="0.01" class="form-control" id="Peso" name="Peso" value="{{ Peso }}" required>
-        </div>
-        <div class="form-group">
-            <label for="Altura">Altura (cm)</label>
-            <input type="number" step="0.01" class="form-control" id="Altura" name="Altura" value="{{ Altura }}" required>
-        </div>
-        <div class="form-group">
-            <label for="Temperatura">Temperatura (°C)</label>
-            <input type="number" step="0.1" class="form-control" id="Temperatura" name="Temperatura" value="{{ Temperatura }}" required>
-        </div>
-        <div class="form-group">
-            <label for="LatidosxMinuto">Latidos por Minuto</label>
-            <input type="number" class="form-control" id="LatidosxMinuto" name="LatidosxMinuto" value="{{ LatidosxMinuto }}" required>
-        </div>
-        <div class="form-group">
-            <label for="Glucosa">Glucosa (mg/dL)</label>
-            <input type="number" step="0.01" class="form-control" id="Glucosa" name="Glucosa" value="{{ Glucosa }}" required>
-        </div>
-        <div class="form-group">
-            <label for="Sintomas">Síntomas</label>
-            <textarea class="form-control" id="Sintomas" name="Sintomas" required>{{ Sintomas }}</textarea>
-        </div>
-        <div class="form-group">
-            <label for="Diagnostico">Diagnóstico</label>
-            <textarea class="form-control" placeholder="Enfermedad encontrada" id="Diagnostico" name="Diagnostico" required>{{ Diagnostico }}</textarea>
-        </div>
-        <div class="form-group">
-            <label for="Tratamiento">Tratamiento</label>
-            <textarea class="form-control" id="Tratamiento" placeholder="Medicamentos a recetar" name="Tratamiento" required>{{ Tratamiento }}</textarea>
-        </div>
-        <div class="form-group">
-            <label for="Indicaciones">Indicaciones</label>
-            <textarea class="form-control" placeholder="Como se usara el medicamento" id="Indicaciones" name="Indicaciones" required>{{ Indicaciones }}</textarea>
-        </div>
-        <div class="form-group">
-            <label for="Estudios">Estudios (opcional)</label>
-            <textarea class="form-control" id="Estudios" name="Estudios">{{ Estudios }}</textarea>
-        </div>
-        <button type="button" class="btn btn-primary" onclick="confirmSubmit()">Guardar</button>
-    </form>
+    </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     function confirmSubmit() {
         const numeroDeExpediente = document.getElementById('numeroDeExpediente').value.trim();
@@ -77,7 +153,12 @@
         // Aquí no incluimos el campo 'Estudios' ya que es opcional
         if (!numeroDeExpediente || !FechaConsulta || !Peso || !Altura || !Temperatura || 
             !LatidosxMinuto || !Glucosa || !Sintomas || !Diagnostico || !Tratamiento || !Indicaciones) {
-            Swal.fire('Campos Vacíos', 'Por favor complete todos los campos obligatorios.', 'warning');
+            Swal.fire({
+                title: 'Campos Vacíos',
+                text: 'Por favor complete todos los campos obligatorios.',
+                icon: 'warning',
+                confirmButtonText: 'Entendido'
+            });
             return;
         }
     

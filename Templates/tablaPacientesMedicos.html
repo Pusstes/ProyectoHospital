@@ -1,0 +1,413 @@
+{% extends 'plantillaAdmin.html' %}
+{% block body %}
+<link rel="stylesheet" href="{{ url_for('static', filename='CSS/tablaPacientes.css') }}">
+
+<div class="container mt-5">
+    <div class="page-header">
+        <h2>Pacientes del Hospital</h2>
+        <p class="text-muted">Listado completo de todos los pacientes atendidos</p>
+    </div>
+
+    <!-- Filtros de búsqueda -->
+    <div class="card filter-card mb-4">
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('todos_pacientes') }}">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="buscar_expediente" class="form-label">Número de Expediente</label>
+                        <input type="text" class="form-control" id="buscar_expediente" name="buscar_expediente" placeholder="Ej: GEJO2303P9">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="buscar_paciente" class="form-label">Nombre del Paciente</label>
+                        <input type="text" class="form-control" id="buscar_paciente" name="buscar_paciente" placeholder="Nombre del paciente">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="buscar_medico" class="form-label">Médico Asignado</label>
+                        <select class="form-select" id="buscar_medico" name="buscar_medico">
+                            <option value="">Todos los médicos</option>
+                            {% for medico in medicos %}
+                                <option value="{{ medico[1] }}">{{ medico[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabs para diferentes vistas -->
+    <ul class="nav nav-tabs" id="pacientesTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="lista-tab" data-bs-toggle="tab" data-bs-target="#lista" type="button" role="tab" aria-controls="lista" aria-selected="true">
+                <i class="fas fa-list"></i> Vista de Lista
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tarjetas-tab" data-bs-toggle="tab" data-bs-target="#tarjetas" type="button" role="tab" aria-controls="tarjetas" aria-selected="false">
+                <i class="fas fa-th-large"></i> Vista de Tarjetas
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="pacientesTabsContent">
+        <!-- Vista de Lista -->
+        <div class="tab-pane fade show active" id="lista" role="tabpanel" aria-labelledby="lista-tab">
+            <div class="card shadow-sm mt-3">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Expediente</th>
+                                    <th>Nombre</th>
+                                    <th>Fecha Nacimiento</th>
+                                    <th>Enfermedades</th>
+                                    <th>Médico</th>
+                                    <th>Consultas</th>
+                                    <th>Últ. Consulta</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if pacientes %}
+                                    {% for paciente in pacientes %}
+                                    <tr>
+                                        <td>{{ paciente.NumeroExpediente }}</td>
+                                        <td>{{ paciente.NombrePaciente }}</td>
+                                        <td>{{ paciente.FechaNacimiento }}</td>
+                                        <td>
+                                            {% if paciente.EnfermedadesCronicas %}
+                                                {{ paciente.EnfermedadesCronicas|truncate(30) }}
+                                            {% else %}
+                                                <span class="text-muted">Ninguna</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ paciente.NombreMedico }}</td>
+                                        <td class="text-center">
+                                            <span class="badge bg-info rounded-pill">{{ paciente.NumConsultas }}</span>
+                                        </td>
+                                        <td>
+                                            {% if paciente.UltimaConsulta %}
+                                                {{ paciente.UltimaConsulta }}
+                                            {% else %}
+                                                <span class="text-muted">Sin consultas</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{{ url_for('actualizarExpediente', id=paciente.ID) }}" class="btn btn-sm btn-warning">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-info" onclick="verDetallesPaciente('{{ paciente.ID }}')">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-danger" onclick="confirmDeletePaciente('{{ paciente.ID }}')">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="8" class="text-center py-4">
+                                            <div class="no-results-message">
+                                                <i class="fas fa-user-slash fa-3x text-muted mb-3"></i>
+                                                <h4>No se encontraron pacientes</h4>
+                                                <p class="text-muted">Intenta con otros criterios de búsqueda o verifica que existan registros.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista de Tarjetas -->
+        <div class="tab-pane fade" id="tarjetas" role="tabpanel" aria-labelledby="tarjetas-tab">
+            <div class="row g-3 mt-2">
+                {% if pacientes %}
+                    {% for paciente in pacientes %}
+                    <div class="col-md-4">
+                        <div class="card h-100 paciente-card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span class="fw-bold">Exp: {{ paciente.NumeroExpediente }}</span>
+                                <span class="badge bg-secondary">{{ paciente.NumConsultas }} consultas</span>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title mb-3">{{ paciente.NombrePaciente }}</h5>
+                                
+                                <div class="patient-info">
+                                    <p class="mb-1">
+                                        <i class="fas fa-calendar-alt text-primary me-2"></i>
+                                        <span class="fw-bold">Nacimiento:</span> 
+                                        {{ paciente.FechaNacimiento }}
+                                    </p>
+                                    
+                                    <p class="mb-1">
+                                        <i class="fas fa-user-md text-success me-2"></i>
+                                        <span class="fw-bold">Médico:</span> 
+                                        {{ paciente.NombreMedico }}
+                                    </p>
+                                    
+                                    <p class="mb-1">
+                                        <i class="fas fa-heartbeat text-danger me-2"></i>
+                                        <span class="fw-bold">Enfermedades:</span> 
+                                        {% if paciente.EnfermedadesCronicas %}
+                                            {{ paciente.EnfermedadesCronicas|truncate(50) }}
+                                        {% else %}
+                                            <span class="text-muted">Ninguna registrada</span>
+                                        {% endif %}
+                                    </p>
+                                    
+                                    <p class="mb-1">
+                                        <i class="fas fa-notes-medical text-warning me-2"></i>
+                                        <span class="fw-bold">Alergias:</span> 
+                                        {% if paciente.Alergias %}
+                                            {{ paciente.Alergias|truncate(50) }}
+                                        {% else %}
+                                            <span class="text-muted">Ninguna registrada</span>
+                                        {% endif %}
+                                    </p>
+
+                                    <p class="mb-1">
+                                        <i class="fas fa-history text-info me-2"></i>
+                                        <span class="fw-bold">Última consulta:</span> 
+                                        {% if paciente.UltimaConsulta %}
+                                            {{ paciente.UltimaConsulta }}
+                                        {% else %}
+                                            <span class="text-muted">Sin consultas</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between">
+                                <button class="btn btn-sm btn-info" onclick="verDetallesPaciente('{{ paciente.ID }}')">
+                                    <i class="fas fa-eye me-1"></i> Detalles
+                                </button>
+                                <a href="{{ url_for('actualizarExpediente', id=paciente.ID) }}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit me-1"></i> Editar
+                                </a>
+                                <button class="btn btn-sm btn-danger" onclick="confirmDeletePaciente('{{ paciente.ID }}')">
+                                    <i class="fas fa-trash-alt me-1"></i> Eliminar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12">
+                        <div class="no-results-card">
+                            <i class="fas fa-user-slash fa-4x text-muted mb-3"></i>
+                            <h4>No se encontraron pacientes</h4>
+                            <p class="text-muted">Intenta con otros criterios de búsqueda o verifica que existan registros.</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para ver detalles de paciente -->
+<div class="modal fade" id="pacienteDetallesModal" tabindex="-1" aria-labelledby="pacienteDetallesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="pacienteDetallesModalLabel">Detalles del Paciente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="pacienteDetallesContent">
+                <!-- El contenido se cargará dinámicamente -->
+                <div class="text-center p-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="mt-3">Cargando información del paciente...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <a href="#" id="editarPacienteBtn" class="btn btn-primary">Editar Expediente</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Función para ver detalles de un paciente
+    // Reemplaza la función verDetallesPaciente en el template todos_pacientes.html
+
+function verDetallesPaciente(pacienteId) {
+    // Mostrar el modal
+    const detallesModal = new bootstrap.Modal(document.getElementById('pacienteDetallesModal'));
+    detallesModal.show();
+    
+    // Configurar el botón de editar
+    document.getElementById('editarPacienteBtn').href = '/editarExpe/' + pacienteId;
+    
+    // Obtener contenedor del contenido
+    const modalContent = document.getElementById('pacienteDetallesContent');
+    
+    // Mostrar spinner de carga
+    modalContent.innerHTML = `
+        <div class="text-center p-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="mt-3">Cargando información del paciente...</p>
+        </div>
+    `;
+    
+    // Realizar petición AJAX para obtener los datos del paciente
+    fetch('/api/paciente/' + pacienteId)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error al cargar los datos del paciente');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Construir el HTML con los datos del paciente
+            let html = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="patient-card mb-3">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">Información del Paciente</h5>
+                            </div>
+                            <div class="card-body">
+                                <h4 class="patient-name">${data.paciente.NombrePaciente}</h4>
+                                <p class="patient-id text-muted mb-3">Expediente: ${data.paciente.NumeroExpediente}</p>
+                                
+                                <div class="info-row">
+                                    <div class="info-label"><i class="fas fa-calendar-alt me-2"></i> Fecha Nacimiento:</div>
+                                    <div class="info-value">${data.paciente.FechaNacimiento || 'No registrada'}</div>
+                                </div>
+                                
+                                <div class="info-row">
+                                    <div class="info-label"><i class="fas fa-user-md me-2"></i> Médico Asignado:</div>
+                                    <div class="info-value">${data.paciente.NombreMedico}</div>
+                                </div>
+                                
+                                <div class="info-row">
+                                    <div class="info-label"><i class="fas fa-heartbeat me-2"></i> Enfermedades:</div>
+                                    <div class="info-value">${data.paciente.EnfermedadesCronicas || 'Ninguna registrada'}</div>
+                                </div>
+                                
+                                <div class="info-row">
+                                    <div class="info-label"><i class="fas fa-notes-medical me-2"></i> Alergias:</div>
+                                    <div class="info-value">${data.paciente.Alergias || 'Ninguna registrada'}</div>
+                                </div>
+                                
+                                <div class="info-row">
+                                    <div class="info-label"><i class="fas fa-users me-2"></i> Antecedentes Familiares:</div>
+                                    <div class="info-value">${data.paciente.AntecedentesFamiliares || 'Ninguno registrado'}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="patient-card mb-3">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0">Actividad del Paciente</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between mb-3">
+                                    <div class="stat-box">
+                                        <div class="stat-value">${data.paciente.NumConsultas}</div>
+                                        <div class="stat-label">Consultas</div>
+                                    </div>
+                                    <div class="stat-box">
+                                        <div class="stat-value">${data.paciente.UltimaConsulta ? 
+                                            new Date(data.paciente.UltimaConsulta).toLocaleDateString() : 'N/A'}</div>
+                                        <div class="stat-label">Última consulta</div>
+                                    </div>
+                                </div>
+            `;
+            
+            // Agregar tabla de últimas consultas si hay alguna
+            if (data.consultas && data.consultas.length > 0) {
+                html += `
+                    <h6 class="mt-4 mb-3">Últimas Consultas</h6>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Diagnóstico</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                data.consultas.forEach(consulta => {
+                    html += `
+                        <tr>
+                            <td>${consulta.FechaConsulta}</td>
+                            <td>${consulta.Diagnostico ? consulta.Diagnostico.substring(0, 30) + (consulta.Diagnostico.length > 30 ? '...' : '') : 'No registrado'}</td>
+                        </tr>
+                    `;
+                });
+                
+                html += `
+                        </tbody>
+                    </table>
+                `;
+            } else {
+                html += `
+                    <div class="alert alert-info mt-3">
+                        <i class="fas fa-info-circle me-2"></i> No hay consultas registradas para este paciente.
+                    </div>
+                `;
+            }
+            
+            html += `
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Insertar el HTML en el modal
+            modalContent.innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            modalContent.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i> 
+                    Error al cargar los datos del paciente. Por favor, intenta de nuevo.
+                </div>
+            `;
+        });
+}
+    
+    // Función para confirmar eliminación de paciente
+    function confirmDeletePaciente(pacienteId) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "Esta acción eliminará permanentemente el expediente del paciente y todos sus datos asociados.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Redireccionar a la ruta de eliminación
+                window.location.href = '/eliminarExpediente/' + pacienteId;
+            }
+        });
+    }
+</script>
+{% endblock %}

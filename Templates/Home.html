@@ -3,7 +3,6 @@
 {% else %}
 {% extends 'plantilla.html' %}
 {% endif %}
-
 {% block body %}
 <link rel="stylesheet" href="/static/CSS/Home.css">
 <div class="container mt-5">
@@ -12,53 +11,267 @@
             <h1>Bienvenidos al Hospital San Cristo</h1>
             <p class="lead">Cuidando de ti y de tu familia con dedicación y profesionalismo.</p>
             <hr class="my-4">
-            <div class="row justify-content-center">
-                <div class="col-md-8">
-                    <!-- <h2>Mensaje de Bienvenida</h2> -->
-                    <p>En el Hospital San Cristo, estamos comprometidos con la salud y el bienestar. Eres parte del
-                        equipo de médicos y personal que está aquí para proporcionar la mejor atención posible. Gracias
-                        por ser parte del equipo.</p>
+
+        </div>
+    </div>
+</div>
+
+{% if session['rol'] == 'MedicoAdmin' %}
+<!-- Dashboard para administradores -->
+<div class="container mt-4 mb-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow border-0">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Panel de Administración</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Tarjetas de estadísticas -->
+                    <div class="row mb-4">
+                        <div class="col-md-4 mb-3">
+                            <a href="{{ url_for('todas_consultas') }}" class="text-decoration-none">
+                                <div class="card border-0 shadow-sm bg-info text-white h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="text-uppercase">Total Consultas</h6>
+                                                <h2 class="font-weight-bold mb-0">{{ total_consultas }}</h2>
+                                            </div>
+                                            <div class="stats-icon">
+                                                <i class="fas fa-calendar-check fa-3x"></i>
+                                            </div>
+                                        </div>
+                                        <p class="small mt-3 mb-0">
+                                            <span class="text-white-50">Clic para ver todas las consultas</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <a href="{{ url_for('consulta') }}" class="text-decoration-none">
+                                <div class="card border-0 shadow-sm bg-success text-white h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="text-uppercase">Médicos Activos</h6>
+                                                <h2 class="font-weight-bold mb-0">{{ total_medicos }}</h2>
+                                            </div>
+                                            <div class="stats-icon">
+                                                <i class="fas fa-user-md fa-3x"></i>
+                                            </div>
+                                        </div>
+                                        <p class="small mt-3 mb-0">
+                                            <span class="text-white-50">Clic para gestionar médicos</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <a href="{{ url_for('todos_pacientes') }}" class="text-decoration-none">
+                                <div class="card border-0 shadow-sm bg-warning text-white h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="text-uppercase">Pacientes Atendidos</h6>
+                                                <h2 class="font-weight-bold mb-0">{{ total_pacientes }}</h2>
+                                            </div>
+                                            <div class="stats-icon">
+                                                <i class="fas fa-users fa-3x"></i>
+                                            </div>
+                                        </div>
+                                        <p class="small mt-3 mb-0">
+                                            <span class="text-white-50">Clic para ver todos los pacientes</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Gráficas originales simplificadas -->
+                    <div class="row">
+                        <!-- Gráfica de Enfermedades Comunes -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0">Diagnósticos Más Comunes</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="enfermedadesChart" style="width: 100%; height: 300px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Gráfica de Consultas por Mes -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0">Consultas por Mes</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="consultasMensualesChart" style="width: 100%; height: 300px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<div class="carousel slide custom-carousel" data-bs-ride="carousel">
-    <div class="carousel-indicators">
-        <button type="button" data-bs-target=".custom-carousel" data-bs-slide-to="0" class="active"
-            aria-current="true" aria-label="Slide 1"></button>
-        <button type="button" data-bs-target=".custom-carousel" data-bs-slide-to="1"
-            aria-label="Slide 2"></button>
-        <button type="button" data-bs-target=".custom-carousel" data-bs-slide-to="2"
-            aria-label="Slide 3"></button>
-    </div>
-    <div class="carousel-inner">
-        <div class="carousel-item active">
-            <div class="carousel-img-wrapper img-1">
-                <img src="{{ url_for('static', filename='IMG/hospital.jpg') }}" alt="Imagen de Bienvenida">
-            </div>
-        </div>
-        <div class="carousel-item">
-            <div class="carousel-img-wrapper img-2">
-                <img src="{{ url_for('static', filename='IMG/doctores2.jpg') }}" alt="Segunda Imagen">
-            </div>
-        </div>
-        <div class="carousel-item">
-            <div class="carousel-img-wrapper img-3">
-                <img src="{{ url_for('static', filename='IMG/sectorsalud.webp') }}" alt="Tercera Imagen">
-            </div>
-        </div>
-    </div>
-    <button class="carousel-control-prev" type="button" data-bs-target=".custom-carousel"
-        data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target=".custom-carousel"
-        data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Next</span>
-    </button>
-</div>
 
+{% else %}
+<!-- Dashboard para médicos regulares -->
+<div class="container mt-4 mb-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow border-0">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Mi Panel Médico</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Tarjetas de estadísticas personales -->
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <a href="{{ url_for('citas_medico') }}" class="text-decoration-none">
+                                <div class="card border-0 shadow-sm bg-info text-white h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="text-uppercase">Mis Consultas</h6>
+                                                <h2 class="font-weight-bold mb-0">{{ medico_consultas }}</h2>
+                                            </div>
+                                            <div class="stats-icon">
+                                                <i class="fas fa-calendar-check fa-3x"></i>
+                                            </div>
+                                        </div>
+                                        <p class="small mt-3 mb-0">
+                                            <span class="text-white-50">Clic para ver tus consultas</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="{{ url_for('consultaP') }}" class="text-decoration-none">
+                                <div class="card border-0 shadow-sm bg-success text-white h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="text-uppercase">Mis Pacientes</h6>
+                                                <h2 class="font-weight-bold mb-0">{{ medico_pacientes }}</h2>
+                                            </div>
+                                            <div class="stats-icon">
+                                                <i class="fas fa-users fa-3x"></i>
+                                            </div>
+                                        </div>
+                                        <p class="small mt-3 mb-0">
+                                            <span class="text-white-50">Clic para ver tus pacientes</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Scripts para ApexCharts (sólo para administradores) -->
+{% if session['rol'] == 'MedicoAdmin' %}
+<script src="{{ url_for('static', filename='js/libs/apexcharts.min.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Gráfico de enfermedades más comunes
+        const enfermedadesOptions = {
+            series: [{
+                name: 'Casos',
+                data: {{ enfermedades_data|safe }}
+            }],
+            chart: {
+                type: 'bar',
+                height: 300,
+                toolbar: {
+                    show: false,
+                }
+            },
+            plotOptions: {
+                bar: {
+                    borderRadius: 4,
+                    horizontal: true,
+                    distributed: true,
+                }
+            },
+            colors: ['#3498db', '#2ecc71', '#f39c12', '#e74c3c', '#9b59b6'],
+            dataLabels: {
+                enabled: true,
+                formatter: function (val) {
+                    return Math.round(val);
+                }
+            },
+            xaxis: {
+                categories: {{ enfermedades_labels|safe }}
+            },
+            tooltip: {
+                y: {
+                    formatter: function(val) {
+                        return Math.round(val) + " casos";
+                    }
+                }
+            }
+        };
+        
+        // Gráfico de consultas mensuales
+        const consultasMensualesOptions = {
+            series: [{
+                name: 'Consultas',
+                data: {{ consultas_mensuales_data|safe }}
+            }],
+            chart: {
+                height: 300,
+                type: 'bar',
+                toolbar: {
+                    show: false,
+                }
+            },
+            plotOptions: {
+                bar: {
+                    borderRadius: 4,
+                    columnWidth: '70%',
+                }
+            },
+            colors: ['#3498db'],
+            xaxis: {
+                categories: {{ consultas_mensuales_labels|safe }}
+            },
+            yaxis: {
+                labels: {
+                    formatter: function(val) {
+                        return Math.round(val);
+                    }
+                }
+            },
+            tooltip: {
+                y: {
+                    formatter: function(val) {
+                        return Math.round(val) + " consultas";
+                    }
+                }
+            }
+        };
+        
+        // Inicializar gráficas
+        const enfermedadesChart = new ApexCharts(document.querySelector("#enfermedadesChart"), enfermedadesOptions);
+        enfermedadesChart.render();
+        
+        const consultasMensualesChart = new ApexCharts(document.querySelector("#consultasMensualesChart"), consultasMensualesOptions);
+        consultasMensualesChart.render();
+    });
+</script>
+{% endif %}
 {% endblock %}

@@ -7,6 +7,9 @@ import random, string, MySQLdb
 from fpdf import FPDF
 import os
 from datetime import datetime
+from collections import defaultdict
+import json
+
 
 app = Flask(__name__)
 app.config['MYSQL_HOST'] = 'localhost'  # host de la base de datos
@@ -85,11 +88,444 @@ def logout():
 def index():
     return render_template('login.html')
 
-#Pagina de inicio de la aplicacion
+# Página de inicio de la aplicación
+# Función API simplificada para consultas mensuales
+@app.route('/api/consultas_mensuales/<int:year>')
+@login_required
+def api_consultas_mensuales(year):
+    cursor = mysql.connection.cursor()
+    
+    # Consultas por mes del año seleccionado
+    cursor.execute('''
+        SELECT 
+            MONTH(FechaConsulta) AS mes, 
+            COUNT(*) AS total
+        FROM diagnostico_y_exploracion
+        WHERE YEAR(FechaConsulta) = %s
+        GROUP BY MONTH(FechaConsulta)
+        ORDER BY mes ASC
+    ''', [year])
+    consultas_mensuales_result = cursor.fetchall()
+    
+    # Crear un array con los 12 meses
+    meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", 
+             "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+    
+    # Inicializar datos para todos los meses con 0
+    consultas_por_mes = [0] * 12
+    
+    # Llenar con datos reales
+    for consulta in consultas_mensuales_result:
+        mes_numero = consulta[0] - 1  # Ajustar índice (1-12 a 0-11)
+        if 0 <= mes_numero < 12:  # Asegurarse de que el índice es válido
+            consultas_por_mes[mes_numero] = consulta[1]
+    
+    cursor.close()
+    
+    return jsonify({
+        'consultas_labels': meses,
+        'consultas_data': consultas_por_mes
+    })
+
+# Página de inicio simplificada para gráficas
+
+
 @app.route('/Home')
 @login_required
 def Home():
-    return render_template('Home.html')
+    cursor = mysql.connection.cursor()
+    current_year = datetime.now().year
+    
+    # Obtener datos según el rol del usuario
+    if session.get('rol') == 'MedicoAdmin':
+        # 1. Obtener el total de consultas
+        cursor.execute('SELECT COUNT(*) FROM diagnostico_y_exploracion')
+        total_consultas = cursor.fetchone()[0]
+        
+        # 2. Obtener el total de médicos activos
+        cursor.execute('SELECT COUNT(*) FROM medicos')
+        total_medicos = cursor.fetchone()[0]
+        
+        # 3. Obtener el total de pacientes atendidos
+        cursor.execute('SELECT COUNT(DISTINCT NombrePaciente) FROM expedientes')
+        total_pacientes = cursor.fetchone()[0]
+        
+        # 4. Obtener las enfermedades más comunes (diagnósticos)
+        cursor.execute('''
+            SELECT SUBSTRING_INDEX(Diagnostico, ',', 1) as diag_principal, COUNT(*) as total 
+            FROM diagnostico_y_exploracion 
+            GROUP BY diag_principal
+            ORDER BY total DESC 
+            LIMIT 5
+        ''')
+        enfermedades_result = cursor.fetchall()
+        
+        # Preparar datos para el gráfico de enfermedades
+        enfermedades_labels = []
+        enfermedades_data = []
+        
+        for enfermedad in enfermedades_result:
+            # Truncar el nombre si es muy largo
+            nombre_enfermedad = enfermedad[0][:25] + '...' if len(enfermedad[0]) > 25 else enfermedad[0]
+            enfermedades_labels.append(nombre_enfermedad)
+            enfermedades_data.append(enfermedad[1])
+            
+        # 5. Consultas por mes (último año)
+        cursor.execute('''
+            SELECT 
+                MONTH(FechaConsulta) AS mes, 
+                COUNT(*) AS total
+            FROM diagnostico_y_exploracion
+            WHERE YEAR(FechaConsulta) = %s
+            GROUP BY MONTH(FechaConsulta)
+            ORDER BY mes ASC
+        ''', [current_year])
+        consultas_mensuales_result = cursor.fetchall()
+        
+        # Crear un array con los 12 meses
+        meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", 
+                 "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+        
+        # Inicializar datos para todos los meses con 0
+        consultas_por_mes = [0] * 12
+        
+        # Llenar con datos reales
+        for consulta in consultas_mensuales_result:
+            mes_numero = consulta[0] - 1  # Ajustar índice (1-12 a 0-11)
+            if 0 <= mes_numero < 12:  # Asegurarse de que el índice es válido
+                consultas_por_mes[mes_numero] = consulta[1]
+                
+        # Para médicos regulares
+        medico_consultas = 0
+        medico_pacientes = 0
+    else:
+        # Para médicos regulares
+        medico_id = session['user_id']
+        
+        # Total de consultas del médico
+        cursor.execute('''
+            SELECT COUNT(*) 
+            FROM diagnostico_y_exploracion de
+            JOIN expedientes e ON de.numeroDeExpediente = e.NumeroExpediente
+            WHERE e.Medico = %s
+        ''', [medico_id])
+        medico_consultas = cursor.fetchone()[0]
+        
+        # Total de pacientes del médico
+        cursor.execute('''
+            SELECT COUNT(*) 
+            FROM expedientes 
+            WHERE Medico = %s
+        ''', [medico_id])
+        medico_pacientes = cursor.fetchone()[0]
+        
+        # Valores por defecto para administrador (no se usan para médicos regulares)
+        total_consultas = 0
+        total_medicos = 0
+        total_pacientes = 0
+        enfermedades_labels = []
+        enfermedades_data = []
+        consultas_por_mes = []
+        meses = []
+    
+    cursor.close()
+    
+    return render_template('Home.html', 
+                          total_consultas=total_consultas,
+                          total_medicos=total_medicos,
+                          total_pacientes=total_pacientes,
+                          medico_consultas=medico_consultas,
+                          medico_pacientes=medico_pacientes,
+                          enfermedades_labels=json.dumps(enfermedades_labels),
+                          enfermedades_data=json.dumps(enfermedades_data),
+                          consultas_mensuales_labels=json.dumps(meses),
+                          consultas_mensuales_data=json.dumps(consultas_por_mes),
+                          current_year=current_year)
+
+# Ruta para visualizar todas las consultas (administrador)
+@app.route('/todas_consultas', methods=['GET', 'POST'])
+@login_required
+def todas_consultas():
+    # Verificar que el usuario sea administrador
+    if session.get('rol') != 'MedicoAdmin':
+        flash('No tienes permiso para acceder a esta página.', 'warning')
+        return redirect(url_for('Home'))
+    
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)  # Usar DictCursor para obtener resultados como diccionarios
+    
+    # Base query
+    query = """
+        SELECT 
+            de.id, 
+            de.numeroDeExpediente, 
+            e.NombrePaciente,
+            m.Nombre as NombreMedico, 
+            DATE_FORMAT(de.FechaConsulta, '%%Y-%%m-%%d') as FechaConsulta, 
+            de.Diagnostico
+        FROM diagnostico_y_exploracion de
+        JOIN expedientes e ON de.numeroDeExpediente = e.NumeroExpediente
+        JOIN medicos m ON e.Medico = m.id
+    """
+    params = []
+    where_clauses = []
+    
+    # Procesar filtros
+    if request.method == 'POST':
+        buscar_expediente = request.form.get('buscar_expediente', '').strip()
+        buscar_paciente = request.form.get('buscar_paciente', '').strip()
+        buscar_medico = request.form.get('buscar_medico', '').strip()
+        buscar_fecha_inicio = request.form.get('buscar_fecha_inicio', '').strip()
+        buscar_fecha_fin = request.form.get('buscar_fecha_fin', '').strip()
+        buscar_diagnostico = request.form.get('buscar_diagnostico', '').strip()
+        
+        if buscar_expediente:
+            where_clauses.append("de.numeroDeExpediente LIKE %s")
+            params.append(f"%{buscar_expediente}%")
+        
+        if buscar_paciente:
+            where_clauses.append("e.NombrePaciente LIKE %s")
+            params.append(f"%{buscar_paciente}%")
+        
+        if buscar_medico:
+            where_clauses.append("m.Nombre LIKE %s")
+            params.append(f"%{buscar_medico}%")
+        
+        if buscar_fecha_inicio:
+            where_clauses.append("de.FechaConsulta >= %s")
+            params.append(buscar_fecha_inicio)
+        
+        if buscar_fecha_fin:
+            where_clauses.append("de.FechaConsulta <= %s")
+            params.append(buscar_fecha_fin)
+        
+        if buscar_diagnostico:
+            where_clauses.append("de.Diagnostico LIKE %s")
+            params.append(f"%{buscar_diagnostico}%")
+    
+    # Añadir WHERE clauses si hay alguna
+    if where_clauses:
+        query += " WHERE " + " AND ".join(where_clauses)
+    
+    # Ordenar por fecha de consulta (más reciente primero)
+    query += " ORDER BY de.FechaConsulta DESC"
+    
+    # Ejecutar consulta
+    cursor.execute(query, params)
+    consultas = cursor.fetchall()
+    
+    # Obtener lista de médicos para el filtro
+    cursor.execute("SELECT id, Nombre FROM medicos ORDER BY Nombre")
+    medicos = cursor.fetchall()
+    
+    cursor.close()
+    
+    return render_template('tablaConsultasMedicos.html', 
+                           consultas=consultas,
+                           medicos=medicos)
+
+# Ruta para ver detalle de una consulta
+@app.route('/ver_consulta/<int:consulta_id>')
+@login_required
+def ver_consulta(consulta_id):
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    
+    # Verificar que el usuario tenga permiso para ver esta consulta
+    if session.get('rol') != 'MedicoAdmin':
+        # Si no es administrador, verificar que la consulta pertenezca a este médico
+        cursor.execute("""
+            SELECT COUNT(*) as count
+            FROM diagnostico_y_exploracion de
+            JOIN expedientes e ON de.numeroDeExpediente = e.NumeroExpediente
+            WHERE de.id = %s AND e.Medico = %s
+        """, [consulta_id, session.get('user_id')])
+        
+        result = cursor.fetchone()
+        if result['count'] == 0:
+            flash('No tienes permiso para ver esta consulta.', 'warning')
+            return redirect(url_for('Home'))
+    
+    # Obtener detalles completos de la consulta
+    cursor.execute("""
+        SELECT 
+            de.*,
+            e.NombrePaciente,
+            e.FechaNacimiento,
+            e.EnfermedadesCronicas,
+            e.Alergias,
+            e.AntecedentesFamiliares,
+            m.Nombre as NombreMedico,
+            m.especialidad as EspecialidadMedico,
+            m.CedulaP as CedulaMedico,
+            TIMESTAMPDIFF(YEAR, e.FechaNacimiento, de.FechaConsulta) as EdadPaciente
+        FROM diagnostico_y_exploracion de
+        JOIN expedientes e ON de.numeroDeExpediente = e.NumeroExpediente
+        JOIN medicos m ON e.Medico = m.id
+        WHERE de.id = %s
+    """, [consulta_id])
+    
+    consulta = cursor.fetchone()
+    
+    if not consulta:
+        flash('Consulta no encontrada.', 'warning')
+        return redirect(url_for('Home'))
+    
+    cursor.close()
+    
+    return render_template('detallesConsulta.html', consulta=consulta)
+   
+
+
+
+# Ruta para visualizar todos los pacientes (administrador)
+# Ruta para visualizar todos los pacientes (administrador)
+@app.route('/todos_pacientes', methods=['GET', 'POST'])
+@login_required
+def todos_pacientes():
+    # Verificar que el usuario sea administrador
+    if session.get('rol') != 'MedicoAdmin':
+        flash('No tienes permiso para acceder a esta página.', 'warning')
+        return redirect(url_for('Home'))
+    
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)  # Usar DictCursor para obtener resultados como diccionarios
+    
+    # Base query
+    query = """
+        SELECT 
+            e.ID,
+            e.NumeroExpediente,
+            e.NombrePaciente,
+            DATE_FORMAT(e.FechaNacimiento, '%%Y-%%m-%%d') as FechaNacimiento,
+            e.EnfermedadesCronicas,
+            e.Alergias,
+            e.AntecedentesFamiliares,
+            m.Nombre as NombreMedico,
+            (
+                SELECT COUNT(*) 
+                FROM diagnostico_y_exploracion de 
+                WHERE de.numeroDeExpediente = e.NumeroExpediente
+            ) as NumConsultas,
+            (
+                SELECT MAX(de.FechaConsulta) 
+                FROM diagnostico_y_exploracion de 
+                WHERE de.numeroDeExpediente = e.NumeroExpediente
+            ) as UltimaConsulta
+        FROM expedientes e
+        JOIN medicos m ON e.Medico = m.id
+    """
+    params = []
+    where_clauses = []
+    
+    # Procesar filtros
+    if request.method == 'POST':
+        buscar_expediente = request.form.get('buscar_expediente', '').strip()
+        buscar_paciente = request.form.get('buscar_paciente', '').strip()
+        buscar_medico = request.form.get('buscar_medico', '').strip()
+        
+        if buscar_expediente:
+            where_clauses.append("e.NumeroExpediente LIKE %s")
+            params.append(f"%{buscar_expediente}%")
+        
+        if buscar_paciente:
+            where_clauses.append("e.NombrePaciente LIKE %s")
+            params.append(f"%{buscar_paciente}%")
+        
+        if buscar_medico:
+            where_clauses.append("m.Nombre LIKE %s")
+            params.append(f"%{buscar_medico}%")
+    
+    # Añadir WHERE clauses si hay alguna
+    if where_clauses:
+        query += " WHERE " + " AND ".join(where_clauses)
+    
+    # Ordenar por nombre de paciente
+    query += " ORDER BY e.NombrePaciente"
+    
+    # Ejecutar consulta
+    cursor.execute(query, params)
+    pacientes = cursor.fetchall()
+    
+    # Obtener lista de médicos para el filtro
+    cursor.execute("SELECT id, Nombre FROM medicos ORDER BY Nombre")
+    medicos = cursor.fetchall()
+    
+    cursor.close()
+    
+    return render_template('tablaPacientesMedicos.html', 
+                           pacientes=pacientes,
+                           medicos=medicos)
+
+# Endpoint para obtener los detalles de un paciente para el modal
+@app.route('/api/paciente/<int:paciente_id>')
+@login_required
+def api_paciente(paciente_id):
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    
+    # Verificar que el usuario tenga permiso para ver este paciente
+    if session.get('rol') != 'MedicoAdmin':
+        # Si no es administrador, verificar que el paciente pertenezca a este médico
+        cursor.execute("""
+            SELECT COUNT(*) as count 
+            FROM expedientes 
+            WHERE ID = %s AND Medico = %s
+        """, [paciente_id, session.get('user_id')])
+        
+        result = cursor.fetchone()
+        if result['count'] == 0:
+            return jsonify({'error': 'No tienes permiso para ver este paciente'}), 403
+    
+    # Obtener detalles completos del paciente
+    cursor.execute("""
+        SELECT 
+            e.*,
+            m.Nombre as NombreMedico,
+            (
+                SELECT COUNT(*) 
+                FROM diagnostico_y_exploracion de 
+                WHERE de.numeroDeExpediente = e.NumeroExpediente
+            ) as NumConsultas,
+            (
+                SELECT MAX(de.FechaConsulta) 
+                FROM diagnostico_y_exploracion de 
+                WHERE de.numeroDeExpediente = e.NumeroExpediente
+            ) as UltimaConsulta
+        FROM expedientes e
+        JOIN medicos m ON e.Medico = m.id
+        WHERE e.ID = %s
+    """, [paciente_id])
+    
+    paciente = cursor.fetchone()
+    
+    if not paciente:
+        return jsonify({'error': 'Paciente no encontrado'}), 404
+    
+    # Obtener las consultas del paciente
+    cursor.execute("""
+        SELECT 
+            de.id,
+            DATE_FORMAT(de.FechaConsulta, '%%Y-%%m-%%d') as FechaConsulta,
+            de.Diagnostico,
+            de.Tratamiento
+        FROM diagnostico_y_exploracion de
+        WHERE de.numeroDeExpediente = %s
+        ORDER BY de.FechaConsulta DESC
+        LIMIT 5
+    """, [paciente['NumeroExpediente']])
+    
+    consultas = cursor.fetchall()
+    
+    cursor.close()
+    
+    # Formatear las fechas para la respuesta JSON
+    if paciente['FechaNacimiento']:
+        paciente['FechaNacimiento'] = paciente['FechaNacimiento'].strftime('%Y-%m-%d')
+    
+    if paciente['UltimaConsulta']:
+        paciente['UltimaConsulta'] = paciente['UltimaConsulta'].strftime('%Y-%m-%d')
+    
+    return jsonify({
+        'paciente': paciente,
+        'consultas': consultas
+    })
 
 #ruta para registrar un medico nuevo Solo accesible para el administrador
 @app.route('/registro')
@@ -98,14 +534,67 @@ def registro():
     return render_template('registro.html')
 
 #ruta para ver los medicos registrados Solo accesible para el administrador
+#ruta para ver los medicos registrados Solo accesible para el administrador
 @app.route('/consulta')
 @login_required
 def consulta():
+    if session.get('rol') != 'MedicoAdmin':
+        flash('No tienes permiso para acceder a esta página.', 'warning')
+        return redirect(url_for('Home'))
+    
     cursor = mysql.connection.cursor()
     cursor.execute('SELECT id, rfc, Nombre, CedulaP, Correo, especialidad, pass, SUBSTR(rol, 1, 8) AS rol FROM medicos')
     medicos = cursor.fetchall()
+    
+    # Obtener lista de especialidades únicas para el filtro
+    cursor.execute('SELECT DISTINCT especialidad FROM medicos ORDER BY especialidad')
+    especialidades_result = cursor.fetchall()
+    especialidades = [especialidad[0] for especialidad in especialidades_result if especialidad[0]]
+    
     cursor.close()
-    return render_template('Consulta.html', medicos=medicos)
+    return render_template('Consulta.html', medicos=medicos, especialidades=especialidades)
+
+# Ruta para buscar médicos
+@app.route('/buscarMedico', methods=['POST'])
+@login_required
+def buscarMedico():
+    if session.get('rol') != 'MedicoAdmin':
+        flash('No tienes permiso para acceder a esta página.', 'warning')
+        return redirect(url_for('Home'))
+    
+    # Obtener parámetros de búsqueda
+    buscar_rfc = request.form.get('buscar_rfc', '').strip()
+    buscar_nombre = request.form.get('buscar_nombre', '').strip()
+    buscar_especialidad = request.form.get('buscar_especialidad', '').strip()
+    
+    # Construir la consulta
+    query = 'SELECT id, rfc, Nombre, CedulaP, Correo, especialidad, pass, SUBSTR(rol, 1, 8) AS rol FROM medicos WHERE 1=1'
+    params = []
+    
+    if buscar_rfc:
+        query += ' AND rfc LIKE %s'
+        params.append(f'%{buscar_rfc}%')
+        
+    if buscar_nombre:
+        query += ' AND Nombre LIKE %s'
+        params.append(f'%{buscar_nombre}%')
+        
+    if buscar_especialidad:
+        query += ' AND especialidad = %s'
+        params.append(buscar_especialidad)
+    
+    cursor = mysql.connection.cursor()
+    cursor.execute(query, params)
+    medicos = cursor.fetchall()
+    
+    # Obtener lista de especialidades para el filtro
+    cursor.execute('SELECT DISTINCT especialidad FROM medicos ORDER BY especialidad')
+    especialidades_result = cursor.fetchall()
+    especialidades = [especialidad[0] for especialidad in especialidades_result if especialidad[0]]
+    
+    cursor.close()
+    
+    return render_template('Consulta.html', medicos=medicos, especialidades=especialidades)
 
 #ruta para ver los pacientes registrados de un medico en sesion
 @app.route('/consultaP')
@@ -121,6 +610,7 @@ def consultaP():
     return render_template('ConsultaP.html', pacientes=pacientes)
 
 #ruta para guardar el medico
+
 @app.route('/GuardarMedico', methods=['POST'])
 @login_required
 def guardarMedico():

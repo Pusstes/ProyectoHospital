@@ -1,48 +1,125 @@
-<!-- agregar css para que el footer no este completamente pegado al formulario de registro -->
 {% extends 'plantillaAdmin.html' %}
 {% block body %}
-<form action="/buscarMedico" method="POST" class="mt-4">
-    <div class="container mt-5">
-        <h2 class="text-center">Médicos Registrados</h2>
+<link rel="stylesheet" href="{{ url_for('static', filename='CSS/tablaMedicos.css') }}">
+
+<div class="container mt-5">
+    <h2 class="text-center">Médicos Registrados</h2>
+
+    <!-- Barra de búsqueda -->
+    <div class="search-container">
+        <form action="/buscarMedico" method="POST" class="row g-3">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                    <input type="text" name="buscar_rfc" class="form-control" placeholder="Buscar por RFC">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-user-md"></i></span>
+                    <input type="text" name="buscar_nombre" class="form-control" placeholder="Buscar por nombre">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-stethoscope"></i></span>
+                    <select name="buscar_especialidad" class="form-select">
+                        <option value="">Especialidad</option>
+                        {% for especialidad in especialidades %}
+                            <option value="{{ especialidad }}">{{ especialidad }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tabla de médicos -->
+    <div class="table-responsive">
         <table class="table table-bordered table-striped">
-            <thead class="thead-dark">
+            <thead>
                 <tr>
-                    <th>rfc</th>
-                    <th>nombre</th>
-                    <th>cedula</th>
-                    <th>correo</th>
-                    <th>especialidad</th>
-                    <th>rol</th>
+                    <th>RFC</th>
+                    <th>Nombre</th>
+                    <th>Cédula</th>
+                    <th>Correo</th>
+                    <th>Especialidad</th>
+                    <th>Rol</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                {% for medico in medicos %}
-                <tr>
-                    <td>{{ medico.1 }}</td>
-                    <td>{{ medico.2 }}</td>
-                    <td>{{ medico.3 }}</td>
-                    <td>{{ medico.4 }}</td>
-                    <td>{{ medico.5 }}</td>
-                    <td>{{ medico.7 }}</td>
-
-                    <td>
-                        <a href="/editar/{{ medico[0] }}" class="btn btn-warning btn-sm">Editar</a>
-                        <a href="#" class="btn btn-danger btn-sm" onclick="confirmDelete('{{ medico[0] }}')">Eliminar</a>
-                    </td>
+                {% if medicos %}
+                    {% for medico in medicos %}
+                    <tr>
+                        <td>{{ medico.1 }}</td>
+                        <td>{{ medico.2 }}</td>
+                        <td>{{ medico.3 }}</td>
+                        <td>{{ medico.4 }}</td>
+                        <td>{{ medico.5 }}</td>
+                        <td>
+                            {% if medico.7 == 'MedicoA' %}
+                                <span class="badge badge-admin">Administrador</span>
+                            {% else %}
+                                <span class="badge badge-medico">Médico</span>
+                            {% endif %}
+                        </td>
+                        <td class="btn-action-container">
+                            <a href="/editar/{{ medico[0] }}" class="btn btn-warning btn-sm">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                            <a href="#" class="btn btn-danger btn-sm" onclick="confirmDelete('{{ medico[0] }}')">
+                                <i class="fas fa-trash-alt"></i> Eliminar
+                            </a>
+                        </td>
+                    </tr>
                     {% endfor %}
-                </tr>
-
+                {% else %}
+                    <tr>
+                        <td colspan="7">
+                            <div class="no-results">
+                                <i class="fas fa-search"></i>
+                                <h4>No se encontraron médicos</h4>
+                                <p>Intenta con otros criterios de búsqueda o añade un nuevo médico.</p>
+                            </div>
+                        </td>
+                    </tr>
+                {% endif %}
             </tbody>
         </table>
     </div>
-</form>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Paginación (futura implementación) -->
+    <!-- <nav aria-label="Navegación de médicos">
+        <ul class="pagination">
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+            </li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#">Siguiente</a>
+            </li>
+        </ul>
+    </nav> -->
+
+    <!-- Botón flotante para añadir médico -->
+    <a href="{{ url_for('registro') }}" class="add-doctor-btn">
+        <i class="fas fa-plus"></i>
+    </a>
+</div>
+
 <script>
     function confirmDelete(medicoId) {
         Swal.fire({
             title: '¿Estás seguro?',
-            text: "No podrás revertir esto",
+            text: "No podrás revertir esta acción",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',

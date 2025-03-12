@@ -1,0 +1,210 @@
+{% extends 'plantillaAdmin.html' if session['rol'] == 'MedicoAdmin' else 'plantilla.html' %}
+{% block body %}
+<link rel="stylesheet" href="{{ url_for('static', filename='CSS/tablaConsultas.css') }}">
+
+<div class="container mt-5">
+    <div class="page-header">
+        <h2>Detalles de la Consulta</h2>
+        <p class="text-muted">Información completa de la consulta médica</p>
+    </div>
+    
+    <div class="mb-4">
+        <a href="{{ url_for('todas_consultas') if session['rol'] == 'MedicoAdmin' else url_for('citas_medico') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i> Volver al listado
+        </a>
+        
+        <a href="{{ url_for('imprimir_receta', cita_id=consulta.id) }}" class="btn btn-primary float-end">
+            <i class="fas fa-file-pdf me-2"></i> Imprimir Receta
+        </a>
+    </div>
+    
+    <div class="row">
+        <!-- Información general de la consulta -->
+        <div class="col-md-6 mb-4">
+            <div class="consulta-detail-card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle me-2"></i> Información General
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 detail-item">
+                            <div class="label">Número de Expediente</div>
+                            <div class="value">{{ consulta.numeroDeExpediente }}</div>
+                        </div>
+                        <div class="col-md-6 detail-item">
+                            <div class="label">Fecha de Consulta</div>
+                            <div class="value">{{ consulta.FechaConsulta }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="label">Médico Tratante</div>
+                        <div class="value">{{ consulta.NombreMedico }} ({{ consulta.EspecialidadMedico }})</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="label">Cédula Profesional</div>
+                        <div class="value">{{ consulta.CedulaMedico }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Información del paciente -->
+        <div class="col-md-6 mb-4">
+            <div class="consulta-detail-card">
+                <div class="card-header">
+                    <i class="fas fa-user me-2"></i> Datos del Paciente
+                </div>
+                <div class="card-body">
+                    <div class="detail-item">
+                        <div class="label">Nombre</div>
+                        <div class="value">{{ consulta.NombrePaciente }}</div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 detail-item">
+                            <div class="label">Fecha de Nacimiento</div>
+                            <div class="value">{{ consulta.FechaNacimiento }}</div>
+                        </div>
+                        <div class="col-md-6 detail-item">
+                            <div class="label">Edad (en fecha de consulta)</div>
+                            <div class="value">{{ consulta.EdadPaciente }} años</div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="label">Enfermedades Crónicas</div>
+                        <div class="value">
+                            {% if consulta.EnfermedadesCronicas %}
+                                {{ consulta.EnfermedadesCronicas }}
+                            {% else %}
+                                <span class="text-muted">Ninguna registrada</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="label">Alergias</div>
+                        <div class="value">
+                            {% if consulta.Alergias %}
+                                {{ consulta.Alergias }}
+                            {% else %}
+                                <span class="text-muted">Ninguna registrada</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Signos vitales y exploración -->
+        <div class="col-md-6 mb-4">
+            <div class="consulta-detail-card">
+                <div class="card-header">
+                    <i class="fas fa-heartbeat me-2"></i> Signos Vitales y Exploración
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <div class="label">Peso</div>
+                                <div class="value">{{ consulta.Peso }} kg</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <div class="label">Altura</div>
+                                <div class="value">{{ consulta.Altura }} cm</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <div class="label">Temperatura</div>
+                                <div class="value">{{ consulta.Temperatura }} °C</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <div class="label">Latidos por Minuto</div>
+                                <div class="value">{{ consulta.LatidosxMinuto }} lpm</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="label">Glucosa</div>
+                        <div class="value">{{ consulta.Glucosa }} mg/dL</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Diagnóstico y tratamiento -->
+        <div class="col-md-6 mb-4">
+            <div class="consulta-detail-card">
+                <div class="card-header">
+                    <i class="fas fa-stethoscope me-2"></i> Diagnóstico y Tratamiento
+                </div>
+                <div class="card-body">
+                    <div class="detail-item">
+                        <div class="label">Síntomas</div>
+                        <div class="value">{{ consulta.Sintomas }}</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="label">Diagnóstico</div>
+                        <div class="value">{{ consulta.Diagnostico }}</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="label">Tratamiento</div>
+                        <div class="value">{{ consulta.Tratamiento }}</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="label">Indicaciones</div>
+                        <div class="value">{{ consulta.Indicaciones }}</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="label">Estudios Recomendados</div>
+                        <div class="value">
+                            {% if consulta.Estudios %}
+                                {{ consulta.Estudios }}
+                            {% else %}
+                                <span class="text-muted">No se recomendaron estudios</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Antecedentes Familiares -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="consulta-detail-card">
+                <div class="card-header">
+                    <i class="fas fa-users me-2"></i> Antecedentes Familiares
+                </div>
+                <div class="card-body">
+                    <div class="detail-item">
+                        <div class="value">
+                            {% if consulta.AntecedentesFamiliares %}
+                                {{ consulta.AntecedentesFamiliares }}
+                            {% else %}
+                                <span class="text-muted">No se registraron antecedentes familiares</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

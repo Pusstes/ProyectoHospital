@@ -1,0 +1,152 @@
+{% extends 'plantillaAdmin.html' %}
+{% block body %}
+<link rel="stylesheet" href="{{ url_for('static', filename='CSS/tablaConsultas.css') }}">
+
+<div class="container mt-5">
+    <div class="page-header">
+        <h2>Registro de Consultas Médicas</h2>
+        <p class="text-muted">Vista general de todas las consultas realizadas en el hospital</p>
+    </div>
+
+    <!-- Filtros de búsqueda -->
+    <div class="card filter-card mb-4">
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('todas_consultas') }}">
+                <div class="row g-3">
+                    <div class="col-md-2">
+                        <label for="buscar_expediente" class="form-label">Expediente</label>
+                        <input type="text" class="form-control" id="buscar_expediente" name="buscar_expediente" placeholder="Ej: GEJO2303P9">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="buscar_paciente" class="form-label">Paciente</label>
+                        <input type="text" class="form-control" id="buscar_paciente" name="buscar_paciente" placeholder="Nombre del paciente">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="buscar_medico" class="form-label">Médico</label>
+                        <input type="text" class="form-control" id="buscar_medico" name="buscar_medico" placeholder="Nombre del médico">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="buscar_fecha_inicio" class="form-label">Fecha inicio</label>
+                        <input type="date" class="form-control" id="buscar_fecha_inicio" name="buscar_fecha_inicio">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="buscar_fecha_fin" class="form-label">Fecha fin</label>
+                        <input type="date" class="form-control" id="buscar_fecha_fin" name="buscar_fecha_fin">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search"></i> Filtrar
+                        </button>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-6">
+                        <label for="buscar_diagnostico" class="form-label">Diagnóstico contiene</label>
+                        <input type="text" class="form-control" id="buscar_diagnostico" name="buscar_diagnostico" placeholder="Ej: diabetes, hipertensión">
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end">
+                        <a href="{{ url_for('todas_consultas') }}" class="btn btn-outline-secondary ms-auto">
+                            <i class="fas fa-redo"></i> Reiniciar filtros
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla de consultas -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Expediente</th>
+                            <th>Paciente</th>
+                            <th>Médico</th>
+                            <th>Fecha</th>
+                            <th>Diagnóstico</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if consultas %}
+                            {% for consulta in consultas %}
+                            <tr>
+                                <td>{{ consulta.numeroDeExpediente }}</td>
+                                <td>{{ consulta.NombrePaciente }}</td>
+                                <td>{{ consulta.NombreMedico }}</td>
+                                <td>{{ consulta.FechaConsulta }}</td>
+                                <td>
+                                    {% if consulta.Diagnostico %}
+                                        {{ consulta.Diagnostico|truncate(50) }}
+                                    {% else %}
+                                        <span class="text-muted">No registrado</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ url_for('ver_consulta', consulta_id=consulta.id) }}" class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ url_for('imprimir_receta', cita_id=consulta.id) }}" class="btn btn-sm btn-secondary">
+                                            <i class="fas fa-file-pdf"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-4">
+                                    <div class="no-results-message">
+                                        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                                        <h4>No se encontraron consultas</h4>
+                                        <p class="text-muted">Intenta con otros criterios de búsqueda o verifica que existan registros.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Estadísticas rápidas -->
+            {% if consultas %}
+            <div class="row mt-4 g-2">
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body text-center py-2">
+                            <p class="mb-0">
+                                <strong>Total de consultas: </strong>
+                                <span class="badge bg-primary rounded-pill">{{ consultas|length }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body text-center py-2">
+                            <p class="mb-0">
+                                <strong>Pacientes únicos: </strong>
+                                <span class="badge bg-success rounded-pill">{{ consultas|map(attribute='NombrePaciente')|unique|list|length }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body text-center py-2">
+                            <p class="mb-0">
+                                <strong>Médicos participantes: </strong>
+                                <span class="badge bg-info rounded-pill">{{ consultas|map(attribute='NombreMedico')|unique|list|length }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

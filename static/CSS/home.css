@@ -1,35 +1,122 @@
-.custom-carousel {
-    max-width: auto; /* Ajusta el ancho máximo según tus necesidades */
-    margin: auto; /* Centra el carrusel */
+/* General Dashboard Styles */
+.dashboard-section {
+    padding: 20px 0;
 }
 
-.custom-carousel .carousel-inner {
-    width: 100%;
-    height: 600px;
+/* Card styling */
+.card {
+    border: none;
+    border-radius: 8px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    border-top-left-radius: 8px !important;
+    border-top-right-radius: 8px !important;
+}
+
+/* Stats cards */
+.border-left-primary {
+    border-left: 4px solid #4e73df !important;
+}
+
+.border-left-success {
+    border-left: 4px solid #1cc88a !important;
+}
+
+.border-left-info {
+    border-left: 4px solid #36b9cc !important;
+}
+
+/* Text styling */
+.text-primary {
+    color: #4e73df !important;
+}
+
+.text-success {
+    color: #1cc88a !important;
+}
+
+.text-info {
+    color: #36b9cc !important;
+}
+
+.text-gray-300 {
+    color: #dddfeb !important;
+}
+
+.text-gray-800 {
+    color: #5a5c69 !important;
+}
+
+/* Table styling */
+.table-responsive {
+    border-radius: 0.35rem;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(78, 115, 223, 0.05);
+}
+
+/* Hospital themed elements */
+.bg-primary {
+    background-color: #1a73e8 !important; /* Medical blue */
+}
+
+.text-primary {
+    color: #1a73e8 !important;
+}
+
+.bg-light {
+    background-color: #f8f9fc !important;
+}
+
+/* Chart container */
+.chart-container {
+    position: relative;
+    margin: auto;
+}
+
+/* Existing carousel styling enhancement */
+.custom-carousel {
+    margin-top: 25px;
+    max-height: 500px;
     overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
 .carousel-img-wrapper {
-    width: 100%;
-    height: 100%;
+    height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     overflow: hidden;
 }
 
 .carousel-img-wrapper img {
     width: 100%;
     height: 100%;
-    object-fit: cover; 
+    object-fit: cover;
+    transition: transform 0.5s ease;
 }
 
-/* Estilos específicos para cada contenedor */
-.img-1 {
-    height:800px; 
+.carousel-img-wrapper:hover img {
+    transform: scale(1.05);
 }
 
-.img-2 {
-    height: 1000px; 
-}
-
-.img-3 {
-    height: 700px;
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 20px;
+    }
+    
+    .carousel-img-wrapper {
+        height: 300px;
+    }
 }

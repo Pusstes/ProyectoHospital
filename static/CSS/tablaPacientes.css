@@ -1,0 +1,340 @@
+/* Estilos para la página de pacientes */
+
+/* Encabezado de página */
+.page-header {
+    margin-bottom: 30px;
+    text-align: center;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+.page-header h2 {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.page-header p {
+    color: #7f8c8d;
+}
+
+.page-header::after {
+    content: '';
+    position: absolute;
+    width: 80px;
+    height: 3px;
+    background-color: #3498db;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Tarjeta de filtros */
+.filter-card {
+    background-color: #f8f9fa;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 25px;
+}
+
+.filter-card .form-label {
+    color: #2c3e50;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.filter-card .form-control,
+.filter-card .form-select {
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+}
+
+.filter-card .form-control:focus,
+.filter-card .form-select:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+/* Tabs de navegación */
+.nav-tabs {
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 15px;
+}
+
+.nav-tabs .nav-link {
+    color: #7f8c8d;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 0;
+    position: relative;
+    transition: all 0.3s;
+}
+
+.nav-tabs .nav-link i {
+    margin-right: 5px;
+}
+
+.nav-tabs .nav-link.active {
+    color: #3498db;
+    background-color: transparent;
+    font-weight: 500;
+}
+
+.nav-tabs .nav-link.active::after {
+    content: '';
+    position: absolute;
+    height: 3px;
+    background-color: #3498db;
+    left: 0;
+    right: 0;
+    bottom: -1px; /* Alinear con el borde inferior del tab */
+}
+
+.nav-tabs .nav-link:hover {
+    color: #2980b9;
+    border-color: transparent;
+}
+
+/* Tabla de pacientes */
+.table {
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background-color: #343a40;
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    padding: 12px 15px;
+    border: none;
+}
+
+.table tbody td {
+    padding: 12px 15px;
+    vertical-align: middle;
+    border-color: #e9ecef;
+}
+
+.table-hover tbody tr {
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(52, 152, 219, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Mensaje sin resultados */
+.no-results-message {
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.no-results-message h4 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.no-results-message p {
+    color: #7f8c8d;
+}
+
+.no-results-card {
+    padding: 60px 30px;
+    text-align: center;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Tarjetas de pacientes */
+.paciente-card {
+    border: none;
+    transition: transform 0.3s, box-shadow 0.3s;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.paciente-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.paciente-card .card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 12px 15px;
+}
+
+.paciente-card .card-title {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 15px;
+    border-left: 4px solid #3498db;
+    padding-left: 10px;
+}
+
+.patient-info p {
+    margin-bottom: 12px;
+    color: #444;
+}
+
+.patient-info i {
+    width: 20px;
+    text-align: center;
+}
+
+.paciente-card .card-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 12px 15px;
+}
+
+/* Botones de acción */
+.btn-group .btn-sm {
+    padding: 5px 8px;
+    font-size: 0.75rem;
+}
+
+.btn-sm i {
+    font-size: 0.9rem;
+}
+
+/* Modal */
+.modal-content {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.modal-title {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.modal-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Estilo para los badges */
+.badge {
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 30px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .card-title {
+        font-size: 1.1rem;
+    }
+    
+    .paciente-card .btn-sm {
+        padding: 4px 6px;
+        font-size: 0.7rem;
+    }
+    
+    .table td, .table th {
+        padding: 8px 10px;
+    }
+}
+/* Añade estos estilos a tu archivo CSS de pacientes */
+
+/* Estilos para el modal de detalles del paciente */
+.patient-card {
+    border: none;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.patient-name {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.patient-id {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+
+.info-row {
+    display: flex;
+    margin-bottom: 12px;
+}
+
+.info-label {
+    width: 40%;
+    color: #34495e;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.info-value {
+    width: 60%;
+    color: #2c3e50;
+}
+
+.stat-box {
+    text-align: center;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    width: 48%;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #3498db;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+    margin-top: 5px;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-content {
+    border-radius: 10px;
+    border: none;
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    background-color: #f8f9fa;
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    background-color: #f8f9fa;
+}
+
+/* Tabla de consultas en el modal */
+.table-sm th {
+    color: #7f8c8d;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border-top: none;
+}
+
+.table-sm td {
+    vertical-align: middle;
+    padding: 6px 8px;
+}

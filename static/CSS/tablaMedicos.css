@@ -1,0 +1,257 @@
+/* Estilos para la página de consulta de médicos */
+
+/* Contenedor principal */
+.container {
+    max-width: 1200px;
+    padding: 20px;
+}
+
+/* Título y encabezados */
+h2.text-center {
+    color: #2c3e50;
+    margin-bottom: 30px;
+    font-weight: 600;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+h2.text-center:after {
+    content: '';
+    position: absolute;
+    width: 100px;
+    height: 3px;
+    background-color: #3498db;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Caja de búsqueda */
+.search-container {
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.search-container input {
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+    padding: 8px 15px;
+}
+
+.search-container button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 15px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.search-container button:hover {
+    background-color: #2980b9;
+}
+
+/* Tabla de médicos */
+.table {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 40px;
+}
+
+.table thead {
+    background-color: #343a40;
+    color: white;
+}
+
+.table th {
+    font-weight: 600;
+    padding: 12px 15px;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    border: none;
+}
+
+.table td {
+    padding: 12px 15px;
+    vertical-align: middle;
+    border-color: #e9ecef;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(52, 152, 219, 0.05);
+}
+
+.table-bordered {
+    border: none;
+}
+
+.table-bordered th,
+.table-bordered td {
+    border-left: none;
+    border-right: none;
+}
+
+/* Estilos para los botones de acción */
+.btn-action-container {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-sm {
+    padding: 5px 10px;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+}
+
+.btn-warning {
+    color: #fff;
+    background-color: #f39c12;
+    border-color: #f39c12;
+}
+
+.btn-warning:hover {
+    background-color: #e67e22;
+    border-color: #e67e22;
+}
+
+.btn-danger {
+    background-color: #e74c3c;
+    border-color: #e74c3c;
+}
+
+.btn-danger:hover {
+    background-color: #c0392b;
+    border-color: #c0392b;
+}
+
+/* Badges para roles */
+.badge {
+    padding: 5px 10px;
+    border-radius: 30px;
+    font-weight: 500;
+    font-size: 0.75rem;
+}
+
+.badge-admin {
+    background-color: #8e44ad;
+    color: white;
+}
+
+.badge-medico {
+    background-color: #2ecc71;
+    color: white;
+}
+
+/* Animación al pasar el mouse sobre las filas */
+.table tbody tr {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.table tbody tr:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: rgba(52, 152, 219, 0.1);
+}
+
+/* Paginación */
+.pagination {
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination .page-item .page-link {
+    color: #3498db;
+    border-radius: 4px;
+    margin: 0 3px;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #3498db;
+    border-color: #3498db;
+}
+
+/* Mensaje de no resultados */
+.no-results {
+    padding: 40px;
+    text-align: center;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-top: 20px;
+}
+
+.no-results i {
+    font-size: 3rem;
+    color: #95a5a6;
+    margin-bottom: 15px;
+}
+
+.no-results h4 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.no-results p {
+    color: #7f8c8d;
+}
+
+/* Botón para agregar médico */
+.add-doctor-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    height: 60px;
+    width: 60px;
+    border-radius: 50%;
+    background-color: #3498db;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s;
+    font-size: 1.5rem;
+    text-decoration: none;
+}
+
+.add-doctor-btn:hover {
+    background-color: #2980b9;
+    transform: scale(1.1);
+    color: white;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+    .table-responsive {
+        border: none;
+    }
+    
+    .btn-sm {
+        padding: 4px 8px;
+        font-size: 0.7rem;
+    }
+    
+    .add-doctor-btn {
+        height: 50px;
+        width: 50px;
+        font-size: 1.2rem;
+        bottom: 20px;
+        right: 20px;
+    }
+}
+
+/* Ajuste para dar espacio al footer */
+.container {
+    margin-bottom: 80px;
+}
