@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard de Medicinas - Hospital San Cristo Redentor</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Navbar margins */
+    nav.navbar {
+      margin-bottom: 20px;
+    }
+  
+    /* Footer margins */
+    footer {
+      margin-top: 20px;
+    }
+  
+    /* Body padding for fixed navbar */
+    body {
+      padding-top: 70px;
+      background-color: #f8f9fa;
+    }
+
+    /* Dashboard card styling */
+    .dashboard-card {
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s;
+      margin-bottom: 20px;
+    }
+    
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card-header {
+      border-radius: 10px 10px 0 0 !important;
+      font-weight: 600;
+    }
+
+    .summary-card {
+      text-align: center;
+      padding: 15px;
+    }
+
+    .summary-card i {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .summary-number {
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    .summary-text {
+      color:black;
+    }
+
+    /* Chart containers */
+    .chart-container {
+      position: relative;
+      height: 300px;
+      width: 100%;
+    }
+
+    /* Medicine section styling */
+    .medicine-list {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .medicine-item {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .medicine-item:hover {
+      background-color: #f8f9fa;
+    }
+
+    .status-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 5px;
+    }
+
+    .status-high {
+      background-color: #28a745;
+    }
+
+    .status-medium {
+      background-color: #ffc107;
+    }
+
+    .status-low {
+      background-color: #dc3545;
+    }
+    
+    /* Modal customization */
+    .modal-header {
+      background-color: #343a40;
+      color: white;
+    }
+    
+    .table-hover tbody tr:hover {
+      background-color: rgba(0, 123, 255, 0.1);
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/Home">Hospital San Cristo</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
+        <li class="nav-item">
+          <span class="navbar-text">Médico: {{ session['nombre_medico'] }}</span>
+        </li>    
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">Acciones</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/Home">Página principal</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Gestion de Médicos
+              </a>
+              <ul class="dropdown-menu dropdown-menu-dark">
+                <!-- link de la template de consulta -->
+                <li><a class="dropdown-item" href="/consulta">Médicos registrados</a></li>
+                <li><a class="dropdown-item" href="/registro">Registrar Médico</a></li>
+                <li><a class="dropdown-item" href="/todas_consultas">Consultas Medicos</a></li>
+                <li><a class="dropdown-item" href="/todos_pacientes">Pacientes</a></li>
+              </ul>
+            </li>
+            <!-- gestion de pacientes -->
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Gestión de Pacientes
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark">
+              <li><a class="dropdown-item" href="/expedientes">Generar Expediente</a></li>
+              <li><a class="dropdown-item" href="/consultaP">Consulta de Expedientes </a></li>
+              <li><a class="dropdown-item" href="/consulta_exploracion_diagnostigo">Dar Consulta</a></li>
+              <li><a class="dropdown-item" href="/citas_medico">Registro de las consultas</a></li>
+            </ul>
+          </li>
+          <!-- gestion de dashboards -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Gestion de Dashboards
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark">
+              <!-- link de la template de consulta -->
+              <li><a class="dropdown-item" href="/medicinas">Panel de Medicina</a></li>
+              <li><a class="dropdown-item" href="/estudios">Panel de estudios</a></li>
+            </ul>
+          </li>
+          <!-- citas -->
+           <li>
+            <a class="nav-link active" aria-current="page" href="/programarCitas">Registro de Citas</a>
+           </li>
+          <li class="nav-item">
+          <li class="nav-item">
+          <button type="button" class="btn btn-outline-danger" onclick="confirmLogout()">Cerrar sesión</button>
+        </li>
+          <!-- fin gestion pacientes -->
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div class="row mb-4">
+      <div class="col">
+        <h1 class="display-5 fw-bold">Dashboard de Medicamentos <i class="fas fa-pills text-primary"></i></h1>
+        <p class="lead">Monitoreo de inventario y administración de medicamentos del Hospital San Cristo</p>
+      </div>
+    </div>
+
+    <!-- Summary Cards Row -->
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <div class="card dashboard-card bg-primary text-white summary-card">
+          <i class="fas fa-capsules"></i>
+          <div class="summary-number">12,456</div>
+          <div class="summary-text">Medicamentos Administrados</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card dashboard-card bg-success text-white summary-card">
+          <i class="fas fa-medkit"></i>
+          <div class="summary-number">485</div>
+          <div class="summary-text">Tipos de Medicamentos</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card dashboard-card bg-warning text-white summary-card">
+          <i class="fas fa-exclamation-triangle"></i>
+          <div class="summary-number">28</div>
+          <div class="summary-text">Bajos en Inventario</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card dashboard-card bg-danger text-white summary-card">
+          <i class="fas fa-prescription-bottle-alt"></i>
+          <div class="summary-number">5</div>
+          <div class="summary-text">Agotados</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+      <div class="col-md-8">
+        <div class="card dashboard-card">
+          <div class="card-header bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+              <span>Administración de Medicamentos por Departamento</span>
+              <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#detallesMedicamentosModal">
+                Ver Detalles <i class="fas fa-external-link-alt ms-1"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="departmentMedicineChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card dashboard-card">
+          <div class="card-header bg-light">
+            <span>Top 5 Medicamentos Más Usados</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="topMedicinesChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Second Row of Charts -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="card dashboard-card">
+          <div class="card-header bg-light">
+            <span>Consumo Mensual de Medicamentos</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="monthlyCostsChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card dashboard-card">
+          <div class="card-header bg-light">
+            <span>Inventario por Categoría</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="inventoryCategoryChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Medicine Inventory Status -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card dashboard-card">
+          <div class="card-header bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+              <span>Estado del Inventario de Medicamentos</span>
+              <div>
+                <button class="btn btn-sm btn-success me-2">
+                  <i class="fas fa-file-excel me-1"></i> Exportar
+                </button>
+                <button class="btn btn-sm btn-info">
+                  <i class="fas fa-sync-alt me-1"></i> Actualizar
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead class="table-light">
+                  <tr>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Stock</th>
+                    <th>Estado</th>
+                    <th>Última actualización</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>MED-001</td>
+                    <td>Paracetamol 500mg</td>
+                    <td>Analgésicos</td>
+                    <td>1240 unidades</td>
+                    <td><span class="status-indicator status-high"></span> Alto</td>
+                    <td>10/04/2025</td>
+                  </tr>
+                  <tr>
+                    <td>MED-098</td>
+                    <td>Amoxicilina 500mg</td>
+                    <td>Antibióticos</td>
+                    <td>856 unidades</td>
+                    <td><span class="status-indicator status-high"></span> Alto</td>
+                    <td>09/04/2025</td>
+                  </tr>
+                  <tr>
+                    <td>MED-145</td>
+                    <td>Omeprazol 20mg</td>
+                    <td>Antiácidos</td>
+                    <td>412 unidades</td>
+                    <td><span class="status-indicator status-medium"></span> Medio</td>
+                    <td>08/04/2025</td>
+                  </tr>
+                  <tr>
+                    <td>MED-067</td>
+                    <td>Loratadina 10mg</td>
+                    <td>Antihistamínicos</td>
+                    <td>125 unidades</td>
+                    <td><span class="status-indicator status-low"></span> Bajo</td>
+                    <td>10/04/2025</td>
+                  </tr>
+                  <tr>
+                    <td>MED-215</td>
+                    <td>Ibuprofeno 400mg</td>
+                    <td>Antiinflamatorios</td>
+                    <td>678 unidades</td>
+                    <td><span class="status-indicator status-high"></span> Alto</td>
+                    <td>07/04/2025</td>
+                  </tr>
+                  <tr>
+                    <td>MED-033</td>
+                    <td>Diazepam 5mg</td>
+                    <td>Ansiolíticos</td>
+                    <td>89 unidades</td>
+                    <td><span class="status-indicator status-low"></span> Bajo</td>
+                    <td>05/04/2025</td>
+                  </tr>
+                  <tr>
+                    <td>MED-178</td>
+                    <td>Metformina 850mg</td>
+                    <td>Antidiabéticos</td>
+                    <td>320 unidades</td>
+                    <td><span class="status-indicator status-medium"></span> Medio</td>
+                    <td>09/04/2025</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Detalles de Medicamentos -->
+  <div class="modal fade" id="detallesMedicamentosModal" tabindex="-1" aria-labelledby="detallesMedicamentosModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="detallesMedicamentosModalLabel">
+            <i class="fas fa-file-medical-alt me-2"></i> Reporte de Administración de Medicamentos
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i> Este reporte muestra el análisis detallado de la administración de medicamentos por departamento en el último trimestre.
+          </div>
+          
+          <h5 class="border-bottom pb-2">Resumen Ejecutivo</h5>
+          <p>Durante el primer trimestre de 2025, el Hospital San Cristo ha registrado un total de <strong>12,456</strong> medicamentos administrados en todos los departamentos. Esto representa un <strong>incremento del 8.7%</strong> respecto al trimestre anterior.</p>
+          
+          <h5 class="border-bottom pb-2 mt-4">Desglose por Departamentos</h5>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Departamento</th>
+                  <th>Total Administrado</th>
+                  <th>Porcentaje</th>
+                  <th>Variación</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Cardiología</td>
+                  <td>2,845</td>
+                  <td>22.8%</td>
+                  <td><span class="text-success">↑ 12.5%</span></td>
+                </tr>
+                <tr>
+                  <td>Pediatría</td>
+                  <td>2,187</td>
+                  <td>17.6%</td>
+                  <td><span class="text-success">↑ 5.2%</span></td>
+                </tr>
+                <tr>
+                  <td>Urgencias</td>
+                  <td>3,421</td>
+                  <td>27.5%</td>
+                  <td><span class="text-success">↑ 15.8%</span></td>
+                </tr>
+                <tr>
+                  <td>Medicina Interna</td>
+                  <td>1,987</td>
+                  <td>15.9%</td>
+                  <td><span class="text-danger">↓ 3.2%</span></td>
+                </tr>
+                <tr>
+                  <td>Oncología</td>
+                  <td>1,245</td>
+                  <td>10.0%</td>
+                  <td><span class="text-success">↑ 7.4%</span></td>
+                </tr>
+                <tr>
+                  <td>Otros</td>
+                  <td>771</td>
+                  <td>6.2%</td>
+                  <td><span class="text-success">↑ 2.1%</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <h5 class="border-bottom pb-2 mt-4">Medicamentos Más Utilizados</h5>
+          <div class="row">
+            <div class="col-md-6">
+              <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  Paracetamol 500mg
+                  <span class="badge bg-primary rounded-pill">1,872</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  Omeprazol 20mg
+                  <span class="badge bg-primary rounded-pill">1,456</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  Ibuprofeno 400mg
+                  <span class="badge bg-primary rounded-pill">1,284</span>
+                </li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  Amoxicilina 500mg
+                  <span class="badge bg-primary rounded-pill">1,102</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  Loratadina
+                  <span class="badge bg-primary rounded-pill">865</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  Metformina 850mg
+                  <span class="badge bg-primary rounded-pill">742</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          
+          <h5 class="border-bottom pb-2 mt-4">Observaciones</h5>
+          <ul>
+            <li>El departamento de Urgencias muestra el mayor aumento en la administración de medicamentos (15.8%), coincidiendo con el aumento estacional de casos respiratorios.</li>
+            <li>Se ha detectado una disminución del 3.2% en Medicina Interna, debido a la implementación de nuevos protocolos de tratamiento que favorecen dosis más precisas.</li>
+            <li>Los analgésicos y antibióticos continúan siendo las categorías de medicamentos más administradas.</li>
+          </ul>
+          
+          <h5 class="border-bottom pb-2 mt-4">Recomendaciones</h5>
+          <ul>
+            <li>Revisar el stock de medicamentos de alta rotación en el departamento de Urgencias.</li>
+            <li>Implementar un sistema de alerta temprana para medicamentos con bajo inventario.</li>
+            <li>Evaluar la efectividad de los nuevos protocolos en Medicina Interna.</li>
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-primary"><i class="fas fa-print me-1"></i> Imprimir Reporte</button>
+          <button type="button" class="btn btn-success"><i class="fas fa-file-pdf me-1"></i> Exportar PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer from the provided code -->
+  <footer class="text-white text-center text-lg-start bg-dark">
+    <!-- Grid container -->
+    <div class="container p-4">
+      <!--Grid row-->
+      <div class="row mt-4">
+        <!--Grid column-->
+        <div class="col-lg-4 col-md-12 mb-4 mb-md-0">
+          <h5 class="text-uppercase mb-4">Cococe un poco más de nuestra filosofía</h5>
+
+          <p>
+            Comprometidos con la excelencia médica y el bienestar integral del paciente, nuestro hospital promueve un
+            enfoque centrado en la compasión, la innovación y la colaboración interdisciplinaria. Nos esforzamos por
+            crear un entorno donde cada profesional de la salud pueda crecer, aprender y contribuir al cuidado de la
+            comunidad con los más altos estándares éticos y clínicos.
+          </p>
+
+          <p>
+            Aplicación desarrollada he implementada por:
+          </p>
+
+          <div class="mt-4">
+            <!-- Facebook -->
+            <a href="https://www.facebook.com/Geraram23"  target="_blank" type="button" class="btn btn-floating btn-light btn-lg"><i
+                class="fab fa-facebook-f"></i></a>
+            <!-- instagram -->
+            <a href="https://www.instagram.com/gera_al2/" target="_blank" type="button" class="btn btn-floating btn-light btn-lg"><i class="fab fa-instagram"></i></a>
+            <!-- Linkedin -->
+            <a  href="" target="_blank" type="button" class="btn btn-floating btn-light btn-lg"><i class="fab fa-linkedin"></i></a>
+          </div>
+        </div>
+        <!--Grid column-->
+
+        <!--Grid column-->
+        <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
+          <h5 class="text-uppercase mb-4 pb-1">Contacto</h5>
+
+          <ul class="fa-ul" style="margin-left: 1.65em;">
+            <li class="mb-3">
+              <span class="fa-li"><i class="fas fa-home"></i></span><span class="ms-2">Av. Constituyentes 302, El Jacal,
+                76187 Santiago de Querétaro, Qro.</span>
+            </li>
+            <li class="mb-3">
+              <span class="fa-li"><i class="fas fa-envelope"></i></span><span
+                class="ms-2">contactGodCristo@outlook.com</span>
+            </li>
+            <li class="mb-3">
+              <span class="fa-li"><i class="fas fa-phone"></i></span><span class="ms-2">+521 442 747 47 99</span>
+            </li>
+          </ul>
+        </div>
+        <!--Grid column-->
+
+        <!--Grid column-->
+        <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
+          <h5 class="text-uppercase mb-4">Horario de consultas</h5>
+
+          <table class="table text-center text-white">
+            <tbody class="fw-normal">
+              <tr>
+                <td>Lun - Jue:</td>
+                <td>7am - 11pm</td>
+              </tr>
+              <tr>
+                <td>Vie - Sa:</td>
+                <td>9am - 4pm</td>
+              </tr>
+              <tr>
+                <td>Domingo:</td>
+                <td>9am - 1pm</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!--Grid column-->
+      </div>
+      <!--Grid row-->
+    </div>
+    <!-- Grid container -->
+
+    <!-- Copyright -->
+    <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
+      © 2025 Copyright:
+      <a class="text-white" href="https://github.com/Pusstes" target="_blank">Gerardo Alberto Ramirez Mejorada</a>
+      <a> con contribución de: </a>
+      <a class="text-white" href="https://github.com/josu460" target="_blank">Josue Rivera Cruz</a>
+    </div>
+    <!-- Copyright -->
+  </footer>
+
+  <!-- Alert for logout -->
+  <script>
+    function confirmLogout() {
+      Swal.fire({
+        title: '¿Estás seguro que quieres cerrar la sesión?',
+        text: "¡Regresaras a la página principal!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, cerrar sesión',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // In a real app, this would redirect to logout
+          Swal.fire(
+            '¡Sesión cerrada!',
+            'Has salido exitosamente.',
+            'success'
+          );
+        }
+      });
+    }
+
+    // Initialize all charts when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function () {
+      // Department Medicine Chart (Bar Chart)
+      const deptCtx = document.getElementById('departmentMedicineChart').getContext('2d');
+      new Chart(deptCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Urgencias', 'Cardiología', 'Pediatría', 'Medicina Interna', 'Oncología', 'Otros'],
+          datasets: [{
+            label: 'Medicamentos Administrados',
+            data: [3421, 2845, 2187, 1987, 1245, 771],
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.7)',
+              'rgba(54, 162, 235, 0.7)',
+              'rgba(255, 206, 86, 0.7)',
+              'rgba(75, 192, 192, 0.7)',
+              'rgba(153, 102, 255, 0.7)',
+              'rgba(255, 159, 64, 0.7)'
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 206, 86, 1)',
+              'rgba(75, 192, 192, 1)',
+              'rgba(153, 102, 255, 1)',
+              'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Cantidad'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Departamento'
+              }
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Distribución por Departamento (Q1 2025)'
+            }
+          }
+        }
+      });
+
+      // Top Medicines Chart (Doughnut)
+      const topMedCtx = document.getElementById('topMedicinesChart').getContext('2d');
+      new Chart(topMedCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Paracetamol', 'Omeprazol', 'Ibuprofeno', 'Amoxicilina', 'Loratadina'],
+          datasets: [{
+            data: [1872, 1456, 1284, 1102, 865],
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.7)',
+              'rgba(54, 162, 235, 0.7)',
+              'rgba(255, 206, 86, 0.7)',
+              'rgba(75, 192, 192, 0.7)',
+              'rgba(153, 102, 255, 0.7)'
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 206, 86, 1)',
+              'rgba(75, 192, 192, 1)',
+              'rgba(153, 102, 255, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            },
+            title: {
+              display: true,
+              text: 'Top 5 Medicamentos (Unidades)'
+            }
+          }
+        }
+      });
+
+      // Monthly Costs Chart (Line)
+      const monthlyCtx = document.getElementById('monthlyCostsChart').getContext('2d');
+      new Chart(monthlyCtx, {
+        type: 'line',
+        data: {
+          labels: ['Enero', 'Febrero', 'Marzo', 'Abril'],
+          datasets: [{
+            label: 'Cantidad administrada',
+            data: [3942, 4156, 4358, 4231],
+            fill: false,
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: false,
+              title: {
+                display: true,
+                text: 'Unidades'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Mes'
+              }
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Tendencia Mensual 2025'
+            }
+          }
+        }
+      });
+
+      // Inventory Category Chart (Radar)
+      const inventoryCtx = document.getElementById('inventoryCategoryChart').getContext('2d');
+      new Chart(inventoryCtx, {
+        type: 'radar',
+        data: {
+          labels: [
+            'Analgésicos',
+            'Antibióticos',
+            'Antiinflamatorios',
+            'Ansiolíticos',
+            'Antihistamínicos',
+            'Antidiabéticos',
+            'Antiácidos'
+          ],
+          datasets: [{
+            label: 'Stock actual',
+            data: [85, 72, 78, 45, 60, 68, 75],
+            fill: true,
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgb(54, 162, 235)',
+            pointBackgroundColor: 'rgb(54, 162, 235)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgb(54, 162, 235)'
+          }, {
+            label: 'Nivel óptimo',
+            data: [80, 80, 80, 80, 80, 80, 80],
+            fill: true,
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgb(255, 99, 132)',
+            pointBackgroundColor: 'rgb(255, 99, 132)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgb(255, 99, 132)'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          elements: {
+            line: {
+              borderWidth: 3
+            }
+          },
+          scales: {
+            r: {
+              angleLines: {
+                display: true
+              },
+              suggestedMin: 0,
+              suggestedMax: 100,
+              ticks: {
+                stepSize: 20
+              }
+            }
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

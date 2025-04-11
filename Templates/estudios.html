@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard de Estudios Médicos - Hospital San Cristo Redentor</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Navbar margins */
+    nav.navbar {
+      margin-bottom: 20px;
+    }
+  
+    /* Footer margins */
+    footer {
+      margin-top: 20px;
+    }
+  
+    /* Body padding for fixed navbar */
+    body {
+      padding-top: 70px;
+      background-color: #f8f9fa;
+    }
+
+    /* Dashboard card styling */
+    .dashboard-card {
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s;
+      margin-bottom: 20px;
+    }
+    
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card-header {
+      border-radius: 10px 10px 0 0 !important;
+      font-weight: 600;
+    }
+
+    .summary-card {
+      text-align: center;
+      padding: 15px;
+    }
+
+    .summary-card i {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .summary-number {
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    .summary-text {
+      color:black;
+    }
+
+    /* Chart containers */
+    .chart-container {
+      position: relative;
+      height: 300px;
+      width: 100%;
+    }
+
+    /* Study items styling */
+    .study-list {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .study-item {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .study-item:hover {
+      background-color: #f8f9fa;
+    }
+
+    .status-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 5px;
+    }
+
+    .status-completed {
+      background-color: #28a745;
+    }
+
+    .status-pending {
+      background-color: #ffc107;
+    }
+
+    .status-urgent {
+      background-color: #dc3545;
+    }
+    
+    /* Modal customization */
+    .modal-header {
+      background-color: #343a40;
+      color: white;
+    }
+    
+    .table-hover tbody tr:hover {
+      background-color: rgba(0, 123, 255, 0.1);
+    }
+    
+    /* Department badges */
+    .badge-cardio {
+      background-color: #ff6b6b;
+    }
+    
+    .badge-neuro {
+      background-color: #48dbfb;
+    }
+    
+    .badge-gastro {
+      background-color: #1dd1a1;
+    }
+    
+    .badge-trauma {
+      background-color: #f368e0;
+    }
+    
+    .badge-onco {
+      background-color: #ff9f43;
+    }
+  </style>
+</head>
+
+<body>
+  <style>
+    /* Agrega margen inferior a la navbar */
+    nav.navbar {
+      margin-bottom: 20px;
+    }
+  
+    /* Agrega margen superior al footer */
+    footer {
+      margin-top: 20px;
+    }
+  
+    /* Asegura que el contenido del body tenga suficiente margen superior para evitar que se superponga con la navbar */
+    body {
+      padding-top: 70px; /* Ajusta este valor según la altura de tu navbar */
+    }
+  </style>
+  
+</head>
+
+<body>
+  <nav class="navbar navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/Home">Hospital San Cristo</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
+        <li class="nav-item">
+          <span class="navbar-text">Médico: {{ session['nombre_medico'] }}</span>
+        </li>    
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">Acciones</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/Home">Página principal</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Gestion de Médicos
+              </a>
+              <ul class="dropdown-menu dropdown-menu-dark">
+                <!-- link de la template de consulta -->
+                <li><a class="dropdown-item" href="/consulta">Médicos registrados</a></li>
+                <li><a class="dropdown-item" href="/registro">Registrar Médico</a></li>
+                <li><a class="dropdown-item" href="/todas_consultas">Consultas Medicos</a></li>
+                <li><a class="dropdown-item" href="/todos_pacientes">Pacientes</a></li>
+              </ul>
+            </li>
+            <!-- gestion de pacientes -->
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Gestión de Pacientes
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark">
+              <li><a class="dropdown-item" href="/expedientes">Generar Expediente</a></li>
+              <li><a class="dropdown-item" href="/consultaP">Consulta de Expedientes </a></li>
+              <li><a class="dropdown-item" href="/consulta_exploracion_diagnostigo">Dar Consulta</a></li>
+              <li><a class="dropdown-item" href="/citas_medico">Registro de las consultas</a></li>
+            </ul>
+          </li>
+          <!-- gestion de dashboards -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Gestion de Dashboards
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark">
+              <!-- link de la template de consulta -->
+              <li><a class="dropdown-item" href="/medicinas">Panel de Medicina</a></li>
+              <li><a class="dropdown-item" href="/estudios">Panel de estudios</a></li>
+            </ul>
+          </li>
+          <!-- citas -->
+           <li>
+            <a class="nav-link active" aria-current="page" href="/programarCitas">Registro de Citas</a>
+           </li>
+          <li class="nav-item">
+          <li class="nav-item">
+          <button type="button" class="btn btn-outline-danger" onclick="confirmLogout()">Cerrar sesión</button>
+        </li>
+          <!-- fin gestion pacientes -->
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+      
+        
+      <!-- End Example Code -->
+    </body>
+  </html>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div class="row mb-4">
+      <div class="col">
+        <h1 class="display-5 fw-bold">Dashboard de Estudios Médicos <i class="fas fa-microscope text-primary"></i></h1>
+        <p class="lead">Estadísticas y seguimiento de estudios clínicos del Hospital San Cristo</p>
+      </div>
+    </div>
+
+    <!-- Summary Cards Row -->
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <div class="card dashboard-card bg-primary text-white summary-card">
+          <i class="fas fa-clipboard-list"></i>
+          <div class="summary-number">8,742</div>
+          <div class="summary-text">Estudios Realizados</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card dashboard-card bg-success text-white summary-card">
+          <i class="fas fa-check-circle"></i>
+          <div class="summary-number">7,850</div>
+          <div class="summary-text">Estudios Completados</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card dashboard-card bg-warning text-white summary-card">
+          <i class="fas fa-clock"></i>
+          <div class="summary-number">815</div>
+          <div class="summary-text">Estudios Pendientes</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card dashboard-card bg-danger text-white summary-card">
+          <i class="fas fa-exclamation-triangle"></i>
+          <div class="summary-number">77</div>
+          <div class="summary-text">Estudios Urgentes</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+      <div class="col-md-8">
+        <div class="card dashboard-card">
+          <div class="card-header bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+              <span>Distribución de Estudios por Departamento</span>
+              <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#detallesEstudiosModal">
+                Ver Informe Detallado <i class="fas fa-external-link-alt ms-1"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="departmentStudiesChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card dashboard-card">
+          <div class="card-header bg-light">
+            <span>Distribución por Tipo de Estudio</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="studyTypesChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Second Row of Charts -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="card dashboard-card">
+          <div class="card-header bg-light">
+            <span>Tendencia Mensual de Estudios</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="monthlyStudiesChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card dashboard-card">
+          <div class="card-header bg-light">
+            <span>Tiempos de Respuesta Promedio por Tipo</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="responseTimeChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Studies List -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card dashboard-card">
+          <div class="card-header bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+              <span>Estudios Recientes</span>
+              <div>
+                <button class="btn btn-sm btn-success me-2">
+                  <i class="fas fa-file-excel me-1"></i> Exportar
+                </button>
+                <button class="btn btn-sm btn-info">
+                  <i class="fas fa-sync-alt me-1"></i> Actualizar
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead class="table-light">
+                  <tr>
+                    <th>ID</th>
+                    <th>Paciente</th>
+                    <th>Tipo de Estudio</th>
+                    <th>Departamento</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>EST-4587</td>
+                    <td>María López García</td>
+                    <td>Resonancia Magnética</td>
+                    <td><span class="badge bg-primary">Neurología</span></td>
+                    <td>10/04/2025</td>
+                    <td><span class="status-indicator status-completed"></span> Completado</td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                      <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-print"></i></button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>EST-4586</td>
+                    <td>Carlos Mendoza Torres</td>
+                    <td>Tomografía Computarizada</td>
+                    <td><span class="badge bg-danger">Cardiología</span></td>
+                    <td>10/04/2025</td>
+                    <td><span class="status-indicator status-urgent"></span> Urgente</td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                      <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-print"></i></button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>EST-4585</td>
+                    <td>Juan Pérez Sánchez</td>
+                    <td>Radiografía de Tórax</td>
+                    <td><span class="badge bg-success">Neumología</span></td>
+                    <td>09/04/2025</td>
+                    <td><span class="status-indicator status-completed"></span> Completado</td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                      <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-print"></i></button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>EST-4584</td>
+                    <td>Laura Martínez Ruiz</td>
+                    <td>Ecografía Abdominal</td>
+                    <td><span class="badge bg-info">Gastroenterología</span></td>
+                    <td>09/04/2025</td>
+                    <td><span class="status-indicator status-pending"></span> Pendiente</td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                      <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-print"></i></button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>EST-4583</td>
+                    <td>Roberto González Flores</td>
+                    <td>Electrocardiograma</td>
+                    <td><span class="badge bg-danger">Cardiología</span></td>
+                    <td>08/04/2025</td>
+                    <td><span class="status-indicator status-completed"></span> Completado</td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                      <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-print"></i></button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>EST-4582</td>
+                    <td>Ana Ramírez Castro</td>
+                    <td>Análisis de Sangre</td>
+                    <td><span class="badge bg-warning">Oncología</span></td>
+                    <td>08/04/2025</td>
+                    <td><span class="status-indicator status-completed"></span> Completado</td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                      <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-print"></i></button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>EST-4581</td>
+                    <td>Fernando Vega Morales</td>
+                    <td>Tomografía de Cráneo</td>
+                    <td><span class="badge bg-primary">Neurología</span></td>
+                    <td>07/04/2025</td>
+                    <td><span class="status-indicator status-pending"></span> Pendiente</td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                      <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-print"></i></button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Detalles de Estudios -->
+  <div class="modal fade" id="detallesEstudiosModal" tabindex="-1" aria-labelledby="detallesEstudiosModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="detallesEstudiosModalLabel">
+            <i class="fas fa-chart-bar me-2"></i> Informe de Estudios Médicos
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i> Este informe muestra el análisis detallado de los estudios médicos realizados en el último trimestre de 2025.
+          </div>
+          
+          <h5 class="border-bottom pb-2">Resumen Ejecutivo</h5>
+          <p>Durante el primer trimestre de 2025, el Hospital San Cristo ha realizado un total de <strong>8,742</strong> estudios médicos de diversa índole. Se observa un <strong>incremento del 12.3%</strong> respecto al mismo período del año anterior, con mejoras significativas en los tiempos de respuesta.</p>
+          
+          <h5 class="border-bottom pb-2 mt-4">Distribución por Departamentos</h5>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Departamento</th>
+                  <th>Total Estudios</th>
+                  <th>Porcentaje</th>
+                  <th>Variación vs Q1 2024</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Cardiología</td>
+                  <td>1,854</td>
+                  <td>21.2%</td>
+                  <td><span class="text-success">↑ 15.4%</span></td>
+                </tr>
+                <tr>
+                  <td>Neurología</td>
+                  <td>1,542</td>
+                  <td>17.6%</td>
+                  <td><span class="text-success">↑ 23.7%</span></td>
+                </tr>
+                <tr>
+                  <td>Gastroenterología</td>
+                  <td>1,378</td>
+                  <td>15.8%</td>
+                  <td><span class="text-success">↑ 8.2%</span></td>
+                </tr>
+                <tr>
+                  <td>Traumatología</td>
+                  <td>1,245</td>
+                  <td>14.2%</td>
+                  <td><span class="text-danger">↓ 3.1%</span></td>
+                </tr>
+                <tr>
+                  <td>Oncología</td>
+                  <td>934</td>
+                  <td>10.7%</td>
+                  <td><span class="text-success">↑ 17.5%</span></td>
+                </tr>
+                <tr>
+                  <td>Otros</td>
+                  <td>1,789</td>
+                  <td>20.5%</td>
+                  <td><span class="text-success">↑ 11.2%</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <h5 class="border-bottom pb-2 mt-4">Tipos de Estudios Más Realizados</h5>
+          <div class="row">
+            <div class="col-md-6">
+              <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  Análisis de Sangre
+                  <span class="badge bg-primary rounded-pill">2,457</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  Radiografías
+                  <span class="badge bg-primary rounded-pill">1,845</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  Ecografías
+                  <span class="badge bg-primary rounded-pill">976</span>
+                </li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  Tomografías
+                  <span class="badge bg-primary rounded-pill">842</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  Electrocardiogramas
+                  <span class="badge bg-primary rounded-pill">784</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  Resonancias Magnéticas
+                  <span class="badge bg-primary rounded-pill">538</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          
+          <h5 class="border-bottom pb-2 mt-4">Tiempos de Respuesta</h5>
+          <p>El tiempo promedio de respuesta para los estudios realizados en este trimestre ha sido de <strong>18.4 horas</strong>, lo que representa una mejora del <strong>22%</strong> respecto al trimestre anterior.</p>
+          
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Tipo de Estudio</th>
+                  <th>Tiempo Promedio (horas)</th>
+                  <th>Mejora</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Análisis de Sangre</td>
+                  <td>8.2</td>
+                  <td><span class="text-success">↑ 31%</span></td>
+                </tr>
+                <tr>
+                  <td>Radiografías</td>
+                  <td>4.5</td>
+                  <td><span class="text-success">↑ 25%</span></td>
+                </tr>
+                <tr>
+                  <td>Tomografías</td>
+                  <td>24.7</td>
+                  <td><span class="text-success">↑ 18%</span></td>
+                </tr>
+                <tr>
+                  <td>Resonancias Magnéticas</td>
+                  <td>36.5</td>
+                  <td><span class="text-success">↑ 12%</span></td>
+                </tr>
+                <tr>
+                  <td>Ecografías</td>
+                  <td>12.8</td>
+                  <td><span class="text-success">↑ 22%</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <h5 class="border-bottom pb-2 mt-4">Observaciones</h5>
+          <ul>
+            <li>El incremento en estudios de Neurología (23.7%) refleja la ampliación del departamento y la adquisición de nuevo equipamiento de última generación.</li>
+            <li>Se observa una disminución en estudios de Traumatología (3.1%), principalmente debido a la reducción estacional de casos.</li>
+            <li>Los tiempos de respuesta han mejorado significativamente gracias a la implementación del nuevo sistema de gestión digital de estudios.</li>
+            <li>Los análisis de sangre y las radiografías continúan siendo los estudios más solicitados, representando el 49.2% del total.</li>
+          </ul>
+          
+          <h5 class="border-bottom pb-2 mt-4">Recomendaciones</h5>
+          <ul>
+            <li>Fortalecer la capacidad en horarios pico para reducir aún más los tiempos de espera en Tomografías y Resonancias.</li>
+            <li>Implementar un sistema de notificación automática para resultados urgentes.</li>
+            <li>Capacitar al personal en la interpretación rápida de estudios prioritarios.</li>
+            <li>Evaluar la posibilidad de adquirir un equipo adicional de resonancia magnética para reducir tiempos de espera.</li>
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-primary"><i class="fas fa-print me-1"></i> Imprimir Informe</button>
+          <button type="button" class="btn btn-success"><i class="fas fa-file-pdf me-1"></i> Exportar PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer from the provided code -->
+  <footer class="text-white text-center text-lg-start bg-dark">
+    <!-- Grid container -->
+    <div class="container p-4">
+      <!--Grid row-->
+      <div class="row mt-4">
+        <!--Grid column-->
+        <div class="col-lg-4 col-md-12 mb-4 mb-md-0">
+          <h5 class="text-uppercase mb-4">Cococe un poco más de nuestra filosofía</h5>
+
+          <p>
+            Comprometidos con la excelencia médica y el bienestar integral del paciente, nuestro hospital promueve un
+            enfoque centrado en la compasión, la innovación y la colaboración interdisciplinaria. Nos esforzamos por
+            crear un entorno donde cada profesional de la salud pueda crecer, aprender y contribuir al cuidado de la
+            comunidad con los más altos estándares éticos y clínicos.
+          </p>
+
+          <p>
+            Aplicación desarrollada he implementada por:
+          </p>
+
+          <div class="mt-4">
+            <!-- Facebook -->
+            <a href="https://www.facebook.com/Geraram23"  target="_blank" type="button" class="btn btn-floating btn-light btn-lg"><i
+                class="fab fa-facebook-f"></i></a>
+            <!-- instagram -->
+            <a href="https://www.instagram.com/gera_al2/" target="_blank" type="button" class="btn btn-floating btn-light btn-lg"><i class="fab fa-instagram"></i></a>
+            <!-- Linkedin -->
+            <a  href="" target="_blank" type="button" class="btn btn-floating btn-light btn-lg"><i class="fab fa-linkedin"></i></a>
+          </div>
+        </div>
+        <!--Grid column-->
+
+        <!--Grid column-->
+        <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
+          <h5 class="text-uppercase mb-4 pb-1">Contacto</h5>
+
+          <ul class="fa-ul" style="margin-left: 1.65em;">
+            <li class="mb-3">
+              <span class="fa-li"><i class="fas fa-home"></i></span><span class="ms-2">Av. Constituyentes 302, El Jacal,
+                76187 Santiago de Querétaro, Qro.</span>
+            </li>
+            <li class="mb-3">
+              <span class="fa-li"><i class="fas fa-envelope"></i></span><span
+                class="ms-2">contactGodCristo@outlook.com</span>
+            </li>
+            <li class="mb-3">
+              <span class="fa-li"><i class="fas fa-phone"></i></span><span class="ms-2">+521 442 747 47 99</span>
+            </li>
+          </ul>
+        </div>
+        <!--Grid column-->
+
+        <!--Grid column-->
+        <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
+          <h5 class="text-uppercase mb-4">Horario de consultas</h5>
+
+          <table class="table text-center text-white">
+            <tbody class="fw-normal">
+              <tr>
+                <td>Lun - Jue:</td>
+                <td>7am - 11pm</td>
+              </tr>
+              <tr>
+                <td>Vie - Sa:</td>
+                <td>9am - 4pm</td>
+              </tr>
+              <tr>
+                <td>Domingo:</td>
+                <td>9am - 1pm</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!--Grid column-->
+      </div>
+      <!--Grid row-->
+    </div>
+    <!-- Grid container -->
+
+    <!-- Copyright -->
+    <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
+      © 2025 Copyright:
+      <a class="text-white" href="https://github.com/Pusstes" target="_blank">Gerardo Alberto Ramirez Mejorada</a>
+      <a> con contribución de: </a>
+      <a class="text-white" href="https://github.com/josu460" target="_blank">Josue Rivera Cruz</a>
+    </div>
+    <!-- Copyright -->
+  </footer>
+
+  <!-- Alert for logout -->
+  <script>
+    function confirmLogout() {
+      Swal.fire({
+        title: '¿Estás seguro que quieres cerrar la sesión?',
+        text: "¡Regresaras a la página principal!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, cerrar sesión',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // In a real app, this would redirect to logout
+          Swal.fire(
+            '¡Sesión cerrada!',
+            'Has salido exitosamente.',
+            'success'
+          );
+        }
+      });
+    }
+
+    // Initialize all charts when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function () {
+      // Department Studies Chart (Bar Chart)
+      const deptCtx = document.getElementById('departmentStudiesChart').getContext('2d');
+      new Chart(deptCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Cardiología', 'Neurología', 'Gastroenterología', 'Traumatología', 'Oncología', 'Otros'],
+          datasets: [{
+            label: 'Estudios Realizados',
+            data: [1854, 1542, 1378, 1245, 934, 1789],
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.7)',
+              'rgba(54, 162, 235, 0.7)',
+              'rgba(255, 206, 86, 0.7)',
+              'rgba(75, 192, 192, 0.7)',
+              'rgba(153, 102, 255, 0.7)',
+              'rgba(255, 159, 64, 0.7)'
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 206, 86, 1)',
+              'rgba(75, 192, 192, 1)',
+              'rgba(153, 102, 255, 1)',
+              'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Cantidad'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Departamento'
+              }
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Distribución por Departamento (Q1 2025)'
+            }
+          }
+        }
+      });
+
+      // Study Types Chart (Doughnut)
+      const studyTypesCtx = document.getElementById('studyTypesChart').getContext('2d');
+      new Chart(studyTypesCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Análisis de Sangre', 'Radiografías', 'Ecografías', 'Tomografías', 'Electrocardiogramas', 'Resonancias'],
+          datasets: [{
+            data: [2457, 1845, 976, 842, 784, 538],
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.7)',
+              'rgba(54, 162, 235, 0.7)',
+              'rgba(255, 206, 86, 0.7)',
+              'rgba(75, 192, 192, 0.7)',
+              'rgba(153, 102, 255, 0.7)',
+              'rgba(255, 159, 64, 0.7)'
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 206, 86, 1)',
+              'rgba(75, 192, 192, 1)',
+              'rgba(153, 102, 255, 1)',
+              'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                boxWidth: 12
+              }
+            },
+            title: {
+              display: true,
+              text: 'Tipos de Estudios'
+            }
+          }
+        }
+      });
+
+      // Monthly Studies Chart (Line)
+      const monthlyCtx = document.getElementById('monthlyStudiesChart').getContext('2d');
+      new Chart(monthlyCtx, {
+        type: 'line',
+        data: {
+          labels: ['Enero', 'Febrero', 'Marzo', 'Abril'],
+          datasets: [{
+            label: 'Estudios realizados',
+            data: [2845, 2965, 2932, 2124],
+            fill: false,
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: false,
+              title: {
+                display: true,
+                text: 'Cantidad'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Mes'
+              }
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Tendencia Mensual 2025'
+            }
+          }
+        }
+      });
+
+      // Response Time Chart (Horizontal Bar)
+      const responseTimeCtx = document.getElementById('responseTimeChart').getContext('2d');
+      new Chart(responseTimeCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Resonancia Magnética', 'Tomografía', 'Ecografía', 'Análisis de Sangre', 'Radiografía', 'Electrocardiograma'],
+          datasets: [{
+            label: 'Tiempo (horas)',
+            data: [36.5, 24.7, 12.8, 8.2, 4.5, 2.3],
+            backgroundColor: 'rgba(54, 162, 235, 0.7)',
+            borderColor: 'rgb(54, 162, 235)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Horas promedio'
+              }
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Tiempo de Respuesta por Tipo de Estudio'
+            }
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+

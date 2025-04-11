@@ -529,7 +529,6 @@ def api_paciente(paciente_id):
 
 #ruta para registrar un medico nuevo Solo accesible para el administrador
 @app.route('/registro')
-@login_required
 def registro():
     return render_template('registro.html')
 
@@ -612,7 +611,7 @@ def consultaP():
 #ruta para guardar el medico
 
 @app.route('/GuardarMedico', methods=['POST'])
-@login_required
+
 def guardarMedico():
     if request.method == 'POST':
         frfc = request.form['rfc']
@@ -661,7 +660,7 @@ def guardarMedico():
 
 #ruta para editar un registro de medico solo accesible para el administrador
 @app.route('/editar/<id>')
-@login_required
+# @login_required
 def editar(id):
     cursor = mysql.connection.cursor()
     cursor.execute('SELECT * FROM medicos WHERE id = %s', [id])
@@ -1102,7 +1101,19 @@ def citas_medico():
     
     return render_template('tabla_citas.html', citas=citas)
 
+@app.route('/medicinas')
+def medicinas():
+    return render_template('medicinas.html')
 
+# Ruta para Dashboard de estudio
+@app.route('/estudios')
+def estudios():
+    return render_template('estudios.html')
+
+# Ruta para programar citas
+@app.route('/programarCitas')
+def programar_citas():
+    return render_template('programar_citas.html')
 
 if __name__ == '__main__':
     # puerto donde se ejecutará la aplicación y debug=True activa el modo de depuración.
